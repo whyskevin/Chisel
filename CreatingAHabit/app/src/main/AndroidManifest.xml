@@ -16,10 +16,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddActivity"
-            android:parentActivityName=".MainActivity"
-            android:label="@string/add_title">
-        </activity>
+        <activity
+            android:name=".AddActivity"
+            android:label="@string/add_title"
+            android:parentActivityName=".MainActivity"></activity>
+        <activity
+            android:name=".DescriptionActivity"
+            ></activity>
+
     </application>
 
 </manifest>

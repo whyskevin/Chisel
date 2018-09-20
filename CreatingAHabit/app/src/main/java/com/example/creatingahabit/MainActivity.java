@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -24,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     ListView userList;
     ArrayList<String> listItem;
     ArrayAdapter adapter;
+
+    DescriptionActivity sm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +72,16 @@ public class MainActivity extends AppCompatActivity {
             }
             adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listItem);
             userList.setAdapter(adapter);
+
+            //making view list buttons to take to different page
+            userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent appInfo = new Intent(MainActivity.this, DescriptionActivity.class);
+                    appInfo.putExtra("name", (String) adapter.getItem(position));
+                    startActivity(appInfo);
+                }
+            });
         }
     }
 

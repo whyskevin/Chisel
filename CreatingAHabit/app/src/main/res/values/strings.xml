@@ -6,5 +6,7 @@
     <string name="name_of_habit">Habit Name</string>
     <string name="description_of_habit">Description</string>
     <string name="frequency_of_habit">Frequency (Per Week)</string>
+    <string name="edit_description">Edit</string>
+    <string name="delete_habit">Delete</string>
 
 </resources>
