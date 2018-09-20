@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Habits</string>
+    <string name="add_name">+</string>
+    <string name="add_title">Add Habit</string>
+    <string name="save_habit">Create</string>
+    <string name="name_of_habit">Habit Name</string>
+    <string name="description_of_habit">Description</string>
+    <string name="frequency_of_habit">Frequency (Per Week)</string>
+
+</resources>
