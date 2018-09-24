@@ -44,28 +44,23 @@
 
     <EditText
         android:id="@+id/frequency"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
+        android:layout_width="130dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="40dp"
         android:layout_marginTop="40dp"
         android:ems="10"
         android:hint="@string/frequency_of_habit"
         android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.072"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/description" />
 
     <Spinner
         android:id="@+id/frequency_spinner"
-        android:layout_width="wrap_content"
+        android:layout_width="175dp"
         android:layout_height="45dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="30dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginTop="40dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/frequency"
         app:layout_constraintTop_toBottomOf="@+id/description"></Spinner>
 
 </android.support.constraint.ConstraintLayout>
