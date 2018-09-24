@@ -14,6 +14,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public static final String COL_1 = "NAME";
     public static final String COL_2 = "DESCRIPTION";
     public static final String COL_3 = "FREQUENCY";
+    public static final String COL_4 = "PERWHAT";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -22,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_NAME + " ( NAME TEXT PRIMARY KEY, DESCRIPTION TEXT, FREQUENCY INTEGER )");
+        sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_NAME + " ( NAME TEXT PRIMARY KEY, DESCRIPTION TEXT, FREQUENCY INTEGER, PERWHAT TEXT )");
 
 
     }
@@ -33,18 +34,21 @@ public class DatabaseHelper extends SQLiteOpenHelper
         onCreate(sqLiteDatabase);
     }
 
-    public boolean insertData( String name, String description, String frequency){
+    public boolean insertData( String name, String description, String frequency, String spinnerFrequency){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL_1, name);
         contentValues.put(COL_2, description);
         contentValues.put(COL_3, Integer.parseInt(frequency));
+        contentValues.put(COL_4, spinnerFrequency);
 
         long result =  db.insert(TABLE_NAME, null, contentValues); //Returns -1 if data is not inserted
         if(result == -1)
             return false;
-        else
+        else {
+            System.out.println("Inserted:" + contentValues.toString());
             return true;
+        }
 
     }
 

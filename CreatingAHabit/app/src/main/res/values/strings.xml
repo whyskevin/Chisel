@@ -5,8 +5,16 @@
     <string name="save_habit">Create</string>
     <string name="name_of_habit">Habit Name</string>
     <string name="description_of_habit">Description</string>
-    <string name="frequency_of_habit">Frequency (Per Week)</string>
+    <string name="frequency_of_habit">Frequency per </string>
     <string name="edit_description">Edit</string>
     <string name="delete_habit">Delete</string>
+
+    <string-array name="frequency_spinner_array">
+        <item>Day</item>
+        <item>Week</item>
+        <item>Month</item>
+        <item>Year</item>
+    </string-array>
+
 
 </resources>
