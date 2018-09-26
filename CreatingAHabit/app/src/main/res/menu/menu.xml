@@ -4,7 +4,7 @@
     <item
         android:id="@+id/add"
         android:title="@string/add_name"
-        android:icon="@drawable/plus_sign"
+        android:icon="@drawable/plus"
         app:showAsAction="always">
     </item>
 
