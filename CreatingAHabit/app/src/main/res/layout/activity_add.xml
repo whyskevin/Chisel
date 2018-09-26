@@ -5,16 +5,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <include
-        layout="@layout/app_bar"
         android:id="@+id/app_bar"
+        layout="@layout/app_bar"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_width="fill_parent">
-    </include>
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="0dp"></include>
 
     <EditText
         android:id="@+id/habitName"
-        android:layout_width="339dp"
+        android:layout_width="330dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
@@ -28,7 +30,7 @@
 
     <EditText
         android:id="@+id/description"
-        android:layout_width="335dp"
+        android:layout_width="330dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
@@ -42,17 +44,24 @@
 
     <EditText
         android:id="@+id/frequency"
-        android:layout_width="338dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
+        android:layout_width="130dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="40dp"
         android:layout_marginTop="40dp"
         android:ems="10"
         android:hint="@string/frequency_of_habit"
         android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/description" />
+
+    <Spinner
+        android:id="@+id/frequency_spinner"
+        android:layout_width="175dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/description"></Spinner>
 
     <Button
         android:id="@+id/button_notif"

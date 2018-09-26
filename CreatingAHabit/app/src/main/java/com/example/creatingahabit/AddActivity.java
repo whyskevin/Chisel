@@ -15,14 +15,20 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.widget.Spinner;
 
-public class AddActivity extends AppCompatActivity{
+
+public class AddActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     DatabaseHelper myDB;
     EditText habitName, habitDescription, habitFrequency;
     MenuItem createHabit;
+    Spinner frequencySpinner;
+    String spinnerSelected;
 
     NotificationCompat.Builder notification;
     private static final int uniqueID = 45612;
@@ -37,12 +43,15 @@ public class AddActivity extends AppCompatActivity{
         Toolbar myToolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(myToolbar);
         ActionBar ab = getSupportActionBar();
+
         ab.setDisplayHomeAsUpEnabled(true);
 
         habitName = (EditText) findViewById(R.id.habitName);
         habitDescription = (EditText) findViewById(R.id.description);
         habitFrequency = (EditText) findViewById(R.id.frequency);
         createHabit = (MenuItem) findViewById(R.id.save);
+        frequencySpinner = (Spinner)findViewById(R.id.frequency_spinner);
+        spinnerCreation();
 
         notification = new NotificationCompat.Builder(this, "MyChannelId_01");
         notification.setAutoCancel(true);
@@ -95,13 +104,21 @@ public class AddActivity extends AppCompatActivity{
         return super.onCreateOptionsMenu(menu);
     }
 
+    public void spinnerCreation(){
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+        R.array.frequency_spinner_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        frequencySpinner.setAdapter(adapter);
+        frequencySpinner.setOnItemSelectedListener(this);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.save:
                 boolean isInserted = myDB.insertData(habitName.getText().toString(),
                         habitDescription.getText().toString(),
-                        habitFrequency.getText().toString());
+                        habitFrequency.getText().toString(), spinnerSelected);
                 if (isInserted) {
                     Toast.makeText(AddActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
                     Intent create = new Intent(this, MainActivity.class);
@@ -116,4 +133,13 @@ public class AddActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+        spinnerSelected = adapterView.getItemAtPosition(position).toString();
+        Toast.makeText(adapterView.getContext(), "Selected spinner frequency: "+ spinnerSelected, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+    }
 }
