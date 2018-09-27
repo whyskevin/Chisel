@@ -51,6 +51,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
         }
 
     }
+    public boolean deleteData(String key)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(TABLE_NAME, COL_1 + " = '" + key + "'", null) > 0;
+    }
 
     public Cursor getAllData(){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -60,9 +65,15 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     public Cursor viewData() {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "Select * from " + TABLE_NAME;
+        String query = "SELECT * FROM " + TABLE_NAME;
         Cursor cursor = db.rawQuery(query, null);
         return cursor;
     }
 
+    public Cursor getItem(String name) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COL_1 + " = '" + name + "'";
+        Cursor rowData = db.rawQuery(query, null);
+        return rowData;
+    }
 }

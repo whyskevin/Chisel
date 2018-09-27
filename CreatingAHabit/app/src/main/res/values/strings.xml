@@ -8,6 +8,8 @@
     <string name="frequency_of_habit">Frequency per </string>
     <string name="edit_description">Edit</string>
     <string name="delete_habit">Delete</string>
+    <string name="divide">\u0020times /\u0020</string>
+
 
     <string-array name="frequency_spinner_array">
         <item>Day</item>
