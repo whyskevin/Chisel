@@ -11,7 +11,6 @@ public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String DATABASE_NAME = "Habits.db";
     public static final String TABLE_NAME = "Habit_Table";
-//    public static final String COL_0 = "ID";
     public static final String COL_1 = "NAME";
     public static final String COL_2 = "DESCRIPTION";
     public static final String COL_3 = "FREQUENCY";
@@ -25,6 +24,8 @@ public class DatabaseHelper extends SQLiteOpenHelper
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_NAME + " ( NAME TEXT PRIMARY KEY, DESCRIPTION TEXT, FREQUENCY INTEGER, TIME_PERIOD TEXT )");
+
+
     }
 
     @Override
@@ -50,20 +51,6 @@ public class DatabaseHelper extends SQLiteOpenHelper
         }
 
     }
-
-    public void updateData(String name, String description, String frequency, String spinnerFrequency){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(COL_1, name);
-        contentValues.put(COL_2, description);
-        contentValues.put(COL_3, Integer.parseInt(frequency));
-        contentValues.put(COL_4, spinnerFrequency);
-
-        String where = COL_1 + "= '" + name + "'";
-        db.update(TABLE_NAME, contentValues, where,null );
-    }
-
-
     public boolean deleteData(String key)
     {
         SQLiteDatabase db = this.getWritableDatabase();

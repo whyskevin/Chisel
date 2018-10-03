@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         viewList();
 
         //button = (Button) findViewById(R.id.displayHabits);
+
         //viewAll();
 
     }
@@ -84,32 +85,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//Method for displaying all values of the database in an Alert Dialog
-//    public void viewAll() {
-//        button.setOnClickListener(new View.OnClickListener(){
-//
-//            @Override
-//            public void onClick(View view) {
-//                Cursor res = myDB.getAllData();
-//                if(res.getCount() == 0){ //A table with empty rows will not have any data
-//                    showMessage("Error", "Nothing found");
-//                }
-//                else {
-//                    StringBuffer buffer = new StringBuffer();
-//                    while (res.moveToNext()){ //Grabs records from the table
-//                        buffer.append("NAME : " + res.getString(0) + "\n");
-//                        buffer.append("DESCRIPTION : " + res.getString(1) + "\n");
-//                        buffer.append("FREQUENCY : " + res.getString(2)+ "\n\n");
-//                    }
-//
-//                    showMessage("Data", buffer.toString());
-//                }
-//            }
-//        });
-//    }
+    public void viewAll() {
+        button.setOnClickListener(new View.OnClickListener(){
 
+            @Override
+            public void onClick(View view) {
+                Cursor res = myDB.getAllData();
+                if(res.getCount() == 0){ //A table with empty rows will not have any data
+                    showMessage("Error", "Nothing found");
+                }
+                else {
+                    StringBuffer buffer = new StringBuffer();
+                    while (res.moveToNext()){ //Grabs records from the table
+                        buffer.append("NAME : " + res.getString(0) + "\n");
+                        buffer.append("DESCRIPTION : " + res.getString(1) + "\n");
+                        buffer.append("FREQUENCY : " + res.getString(2)+ "\n\n");
+                    }
 
-    //Purpose: Displays any String message in an Alerg
+                    showMessage("Data", buffer.toString());
+                }
+            }
+        });
+    }
+
     public void showMessage(String title, String message){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(true);
