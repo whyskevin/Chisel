@@ -23,11 +23,13 @@
         <activity
             android:name=".DescriptionActivity"
             ></activity>
-        <!-- parentActivityName describes the parent. MenuBar back button will revert to the parent Activity-->
-        <activity
-            android:name=".EditHabitActivity"
-            android:label="@string/add_title"
-            android:parentActivityName=".MainActivity"></activity>
+        <receiver android:name=".NotificationReceiver" android:enabled="true">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+                <action android:name="my.action.data" />
+                <!-- and some more actions if you want -->
+            </intent-filter>
+        </receiver>
 
     </application>
 
