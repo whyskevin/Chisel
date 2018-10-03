@@ -6,13 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Will complain about the app_bar constraints. Set top,left, and right to zero -->
     <include
         android:id="@+id/app_bar"
         layout="@layout/app_bar"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="0dp"></include>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"></include>
 
     <EditText
         android:id="@+id/habitName"
@@ -64,12 +66,12 @@
         app:layout_constraintTop_toBottomOf="@+id/description"></Spinner>
 
     <Button
-        android:id="@+id/button_notif"
+        android:id="@+id/button_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:onClick="notifButtonClicked"
-        android:text="Notify"
+        android:onClick="clickSave"
+        android:text="Save"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/frequency" />

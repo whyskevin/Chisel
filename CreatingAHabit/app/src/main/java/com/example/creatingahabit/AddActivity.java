@@ -1,11 +1,9 @@
 package com.example.creatingahabit;
 
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -19,28 +17,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.Spinner;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 
 public class AddActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     DatabaseHelper myDB;
     EditText habitName, habitDescription, habitFrequency;
-    TextView reminderTime;
     MenuItem createHabit;
     Spinner frequencySpinner;
     String spinnerSelected;
-    Switch reminder_switch;
-    Calendar setTimeReminder;
 
     NotificationCompat.Builder notification;
     private static final int uniqueID = 45612;
@@ -67,23 +55,6 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
 
         notification = new NotificationCompat.Builder(this, "MyChannelId_01");
         notification.setAutoCancel(true);
-
-        reminderTime = findViewById(R.id.time);
-        reminder_switch = findViewById(R.id.switch1);
-        reminder_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked) {
-                    reminderTime.setVisibility(View.VISIBLE);
-
-                }
-                else {
-                    reminderTime.setVisibility(View.GONE);
-                }
-            }
-        });
-
-        setTimeReminder = Calendar.getInstance();
 
     }
 
@@ -150,23 +121,6 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
                         habitFrequency.getText().toString(), spinnerSelected);
                 if (isInserted) {
                     Toast.makeText(AddActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
-
-                    //send data to notification receiver
-
-                    //for testing purposes
-                    //Calendar calendar = Calendar.getInstance();
-                    //calendar.add(Calendar.SECOND, 5);
-
-                    //set reminder here with alarm service
-                    AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-                    Intent intent = new Intent(getApplicationContext(), NotificationReceiver.class);
-                    intent.putExtra("name", habitName.getText().toString());
-                    intent.putExtra("description", habitDescription.getText().toString());
-                    intent.putExtra("frequency", habitFrequency.getText().toString());
-                    intent.putExtra("timePeriod", spinnerSelected.toString());
-                    PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, setTimeReminder.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
-
                     Intent create = new Intent(this, MainActivity.class);
                     startActivity(create);
                 } else {
@@ -188,19 +142,4 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
     }
-
-    public void setTime(View view) {
-        TimePickerDialog timePickerDialog;
-        timePickerDialog = new TimePickerDialog(AddActivity.this, new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                setTimeReminder.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                setTimeReminder.set(Calendar.MINUTE, minute);
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a");
-                reminderTime.setText(simpleDateFormat.format(setTimeReminder.getTime()));
-            }
-        }, 12, 00,false);
-        timePickerDialog.show();
-    }
-
 }

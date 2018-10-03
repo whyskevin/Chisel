@@ -5,15 +5,10 @@
     <string name="save_habit">Create</string>
     <string name="name_of_habit">Habit Name</string>
     <string name="description_of_habit">Description</string>
-    <string name="frequency_of_habit">Frequency per\u0020</string>
+    <string name="frequency_of_habit">Frequency per </string>
     <string name="edit_description">Edit</string>
     <string name="delete_habit">Delete</string>
     <string name="divide">\u0020times /\u0020</string>
-    <string name="set_reminder">Reminder\u0020</string>
-    <string name="time_reminder">12:00 AM</string>
-    <string name="confirmation_text">Are you sure you want to delete this habit?</string>
-    <string name="yes_button">Yes</string>
-    <string name="no_button">No</string>
 
 
     <string-array name="frequency_spinner_array">
