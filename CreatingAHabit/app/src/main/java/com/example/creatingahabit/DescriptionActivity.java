@@ -12,9 +12,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
+
+
+//Puts data into activity_description.xml
 public class DescriptionActivity extends AppCompatActivity {
 
 
@@ -27,6 +32,7 @@ public class DescriptionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_description);
+        //Toolbar creation
         Toolbar myToolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(myToolbar);
         ActionBar ab = getSupportActionBar();
@@ -61,6 +67,18 @@ public class DescriptionActivity extends AppCompatActivity {
             freq.setText(cursor.getString(2) + getString(R.string.divide) + cursor.getString(3));
             desc.setText(cursor.getString(1));
         }
+    }
+
+
+// Purpose: Method that starts the  EditHabitActivity when the "Edit" button is clicked
+    public void clickEdit(View view){
+        Intent editIntent = new Intent(this, EditHabitActivity.class);
+        Bundle extra = new Bundle();
+        //Passes the habit name into the Intent extra
+        extra.putString("habit_name",name);
+        editIntent.putExtras(extra);
+        //This starts the new edit activity
+        startActivity(editIntent);
     }
 
     public void clickDelete(View view) {
