@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="blocksDescendants">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="209dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="31dp"
+        android:padding="2dp"
+        android:text="TextView" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="51dp"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="63dp"
+        android:background="@drawable/circle_shape"
+        android:lineSpacingExtra="8sp"
+        android:text="Mon"
+        android:textSize="8sp" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="51dp"
+        android:layout_height="50dp"
+        android:layout_alignTop="@+id/button"
+        android:layout_toEndOf="@+id/button"
+        android:background="@drawable/circle_shape"
+        android:lineSpacingExtra="8sp"
+        android:text="Tues"
+        android:textSize="8sp" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="51dp"
+        android:layout_height="50dp"
+        android:layout_alignTop="@+id/button"
+        android:layout_toEndOf="@+id/button1"
+        android:background="@drawable/circle_shape"
+        android:lineSpacingExtra="8sp"
+        android:text="Wed"
+        android:textSize="8sp" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="51dp"
+        android:layout_height="50dp"
+        android:layout_alignTop="@+id/button"
+        android:layout_toEndOf="@+id/button2"
+        android:background="@drawable/circle_shape"
+        android:lineSpacingExtra="8sp"
+        android:text="Thurs"
+        android:textSize="8sp" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="51dp"
+        android:layout_height="50dp"
+        android:layout_alignTop="@+id/button"
+        android:layout_toEndOf="@+id/button3"
+        android:background="@drawable/circle_shape"
+        android:lineSpacingExtra="8sp"
+        android:text="Fri"
+        android:textSize="8sp" />
+
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="51dp"
+        android:layout_height="50dp"
+        android:layout_alignTop="@+id/button"
+        android:layout_toEndOf="@+id/button4"
+        android:background="@drawable/circle_shape"
+        android:lineSpacingExtra="8sp"
+        android:text="Sat"
+        android:textSize="8sp" />
+
+    <Button
+        android:id="@+id/button6"
+        android:layout_width="51dp"
+        android:layout_height="50dp"
+        android:layout_alignTop="@+id/button"
+        android:layout_toEndOf="@+id/button5"
+        android:background="@drawable/circle_shape"
+        android:lineSpacingExtra="8sp"
+        android:text="Sun"
+        android:textSize="8sp" />
+</RelativeLayout>
