@@ -1,5 +1,6 @@
 package com.example.creatingahabit;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.ActionBar;
@@ -28,6 +29,7 @@ public class DescriptionActivity extends AppCompatActivity {
     TextView freq;
     TextView desc;
     String name;
+    Dialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,7 @@ public class DescriptionActivity extends AppCompatActivity {
             setTitle(name);
             showInfo(name);
         }
+        dialog = new Dialog(this);
     }
 
     @Override
@@ -85,6 +88,38 @@ public class DescriptionActivity extends AppCompatActivity {
     }
 
     public void clickDelete(View view) {
+        TextView txtclose;
+        Button yes, no;
+        dialog.setContentView(R.layout.confirmation_popup_window);
+        txtclose = (TextView) dialog.findViewById(R.id.close_window);
+        yes = dialog.findViewById(R.id.btn_yes);
+        no = dialog.findViewById(R.id.btn_no);
+        boolean delete = false;
+        //close the window using the x button on top right
+        txtclose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        //yes button
+        yes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                delete();
+            }
+        });
+        //no button
+        no.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+    public void delete() {
         if(myDB.deleteData(String.valueOf(myDB.returnID(name)))) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);

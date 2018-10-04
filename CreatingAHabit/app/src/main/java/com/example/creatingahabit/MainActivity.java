@@ -114,25 +114,6 @@ public class MainActivity extends AppCompatActivity {
                 viewHolder.title = (TextView) convertView.findViewById(R.id.textView);
 
                 viewHolder.title.setText(getItem(position).toString());
-<<<<<<< HEAD
-
-                ////////////////////////
-                //making view list buttons to take to different page
-                userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Intent appInfo = new Intent(MainActivity.this, DescriptionActivity.class);
-                        //Passes the habit name within the list into the Intent. Habit names are unique so this is okay!
-                        appInfo.putExtra("name", (String) adapter.getItem(position));
-                        startActivity(appInfo);
-                    }
-                });
-                /////////////////////////
-
-
-
-=======
->>>>>>> e441928d634dbbbea7ba1d84a455ade99630e492
                 viewHolder.buttonMon = (Button) convertView.findViewById(R.id.button);
                 viewHolder.buttonMon.setOnClickListener(new View.OnClickListener() {
                     int i=1;
