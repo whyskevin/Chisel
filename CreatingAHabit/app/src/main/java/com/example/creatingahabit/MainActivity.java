@@ -47,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
         listItem = new ArrayList<>();
         userList = findViewById(R.id.user_list);
         viewList();
-        userList.setAdapter(new myListAdapter( this, R.layout.list_item, listItem));
+        adapter = new myListAdapter( this, R.layout.list_item, listItem);
+        userList.setAdapter(adapter);
 
         //button = (Button) findViewById(R.id.displayHabits);
 
@@ -77,10 +78,11 @@ public class MainActivity extends AppCompatActivity {
         }
         else {
             while(cursor.moveToNext()) {
-                listItem.add(cursor.getString(0));  //col 1 is name, col 0 is id
+                listItem.add(cursor.getString(1));  //col 1 is name, col 0 is id
             }
         }
     }
+
     private class myListAdapter extends ArrayAdapter<String> {
         private int layout;
         public myListAdapter(@NonNull Context context, int resource, @NonNull List<String> objects) {
@@ -108,7 +110,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         Intent appInfo = new Intent(MainActivity.this, DescriptionActivity.class);
-                        // appInfo.putExtra("name", (String) adapter.getItem(position));
+                        //Passes the habit name within the list into the Intent. Habit names are unique so this is okay!
+                        appInfo.putExtra("name", (String) adapter.getItem(position));
                         startActivity(appInfo);
                     }
                 });
