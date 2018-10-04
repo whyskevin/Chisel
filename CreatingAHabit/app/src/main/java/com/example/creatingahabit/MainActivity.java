@@ -80,6 +80,17 @@ public class MainActivity extends AppCompatActivity {
             while(cursor.moveToNext()) {
                 listItem.add(cursor.getString(1));  //col 1 is name, col 0 is id
             }
+            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listItem);
+            userList.setAdapter(adapter);
+            //making view list buttons to take to different page
+            userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Intent appInfo = new Intent(MainActivity.this, DescriptionActivity.class);
+                    appInfo.putExtra("name", (String) adapter.getItem(position));
+                    startActivity(appInfo);
+                }
+            });
         }
     }
 
@@ -103,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 viewHolder.title = (TextView) convertView.findViewById(R.id.textView);
 
                 viewHolder.title.setText(getItem(position).toString());
+<<<<<<< HEAD
 
                 ////////////////////////
                 //making view list buttons to take to different page
@@ -119,6 +131,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+=======
+>>>>>>> e441928d634dbbbea7ba1d84a455ade99630e492
                 viewHolder.buttonMon = (Button) convertView.findViewById(R.id.button);
                 viewHolder.buttonMon.setOnClickListener(new View.OnClickListener() {
                     int i=1;
