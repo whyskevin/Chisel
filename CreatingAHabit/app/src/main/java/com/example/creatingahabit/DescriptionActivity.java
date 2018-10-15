@@ -57,6 +57,7 @@ public class DescriptionActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent add = new Intent(this, MainActivity.class);
+        myDB.close();
         startActivity(add);
         return super.onOptionsItemSelected(item);
     }
@@ -83,6 +84,7 @@ public class DescriptionActivity extends AppCompatActivity {
         //Passes the habit name into the Intent extra
         extra.putString("habit_name",name);
         editIntent.putExtras(extra);
+        myDB.close();
         //This starts the new edit activity
         startActivity(editIntent);
     }
@@ -122,6 +124,7 @@ public class DescriptionActivity extends AppCompatActivity {
     public void delete() {
         if(myDB.deleteData(String.valueOf(myDB.returnID(name)))) {
             Intent intent = new Intent(this, MainActivity.class);
+            myDB.close();
             startActivity(intent);
             Toast.makeText(DescriptionActivity.this, "Habit deleted", Toast.LENGTH_LONG).show();
         }

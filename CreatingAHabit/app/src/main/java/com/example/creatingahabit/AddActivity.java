@@ -145,7 +145,8 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.save:
-                boolean isInserted = myDB.insertData(habitName.getText().toString(),
+                String habitNameTrimmed = habitName.getText().toString().trim();
+                boolean isInserted = myDB.insertData(habitNameTrimmed,
                         habitDescription.getText().toString(),
                         habitFrequency.getText().toString(), spinnerSelected);
                 if (isInserted) {
@@ -154,8 +155,8 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
                     //send data to notification receiver
 
                     //for testing purposes
-                    //Calendar calendar = Calendar.getInstance();
-                    //calendar.add(Calendar.SECOND, 5);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.add(Calendar.SECOND, 5);
 
                     //set reminder here with alarm service
                     AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -165,7 +166,7 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
                     intent.putExtra("frequency", habitFrequency.getText().toString());
                     intent.putExtra("timePeriod", spinnerSelected.toString());
                     PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, setTimeReminder.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
 
                     Intent create = new Intent(this, MainActivity.class);
                     startActivity(create);
