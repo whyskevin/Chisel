@@ -47,6 +47,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public boolean insertData( String name, String description, String frequency, String spinnerFrequency){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
+        if(name.equals("") || frequency.equals("")) {
+            return false;
+        }
         contentValues.put(COL_1, name);
         contentValues.put(COL_2, description);
         contentValues.put(COL_3, Integer.parseInt(frequency));

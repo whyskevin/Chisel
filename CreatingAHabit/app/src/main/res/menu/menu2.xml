@@ -4,7 +4,7 @@
     <item
         android:id="@+id/save"
         android:title="@string/save_habit"
-        android:icon="@drawable/checkmark"
+        android:icon="@drawable/white_checkmark"
         app:showAsAction="always">
     </item>
 

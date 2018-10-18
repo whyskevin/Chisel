@@ -105,9 +105,14 @@ public class EditHabitActivity extends AppCompatActivity implements AdapterView.
     }
 
     public void clickSave(View view){
-        myDB.updateData(habitID, habitName.getText().toString(),
-                habitDescription.getText().toString(),
-                habitFrequency.getText().toString(), spinnerSelected);
+        String name = habitName.getText().toString().trim();
+        if(name.length() != 0) {
+            myDB.updateData(habitID, name, habitDescription.getText().toString(),
+                            habitFrequency.getText().toString(), spinnerSelected);
+        }
+        else {
+            Toast.makeText(this, "Habit name cannot be empty", Toast.LENGTH_SHORT).show();
+        }
         Intent create = new Intent(this, MainActivity.class);
         startActivity(create);
     }
