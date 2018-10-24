@@ -27,7 +27,7 @@ public class EditHabitActivity extends AppCompatActivity implements AdapterView.
     MenuItem createHabit;
     Spinner frequencySpinner;
     String spinnerSelected;
-    //    String formerHabitName;
+    String formerHabitName;
     private int habitID;
 
     @Override
@@ -55,6 +55,7 @@ public class EditHabitActivity extends AppCompatActivity implements AdapterView.
         Bundle extras = intent.getExtras();
         //Habit name is passed through the Intent
         String message = extras.getString("habit_name");
+        formerHabitName = message; //consolidate later@@@@@@@@@@@@@@@@@@@@@@@@@
         setTitle(message);
 //        formerHabitName = habitName.getText().toString();
         habitID = myDB.returnID(message);
@@ -106,14 +107,16 @@ public class EditHabitActivity extends AppCompatActivity implements AdapterView.
 
     public void clickSave(View view){
         String name = habitName.getText().toString().trim();
+        Intent create = new Intent(this, DescriptionActivity.class);
         if(name.length() != 0) {
             myDB.updateData(habitID, name, habitDescription.getText().toString(),
                             habitFrequency.getText().toString(), spinnerSelected);
+            create.putExtra("name", name);
         }
         else {
             Toast.makeText(this, "Habit name cannot be empty", Toast.LENGTH_SHORT).show();
+            create.putExtra("name", formerHabitName);
         }
-        Intent create = new Intent(this, MainActivity.class);
         startActivity(create);
     }
 
