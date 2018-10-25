@@ -146,7 +146,7 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
         switch(item.getItemId()) {
             case R.id.save:
                 String habitNameTrimmed = habitName.getText().toString().trim();
-                boolean isInserted = myDB.insertData(habitNameTrimmed,
+                boolean isInserted = myDB.insertDataToHT(habitNameTrimmed,
                         habitDescription.getText().toString(),
                         habitFrequency.getText().toString(), spinnerSelected);
                 if (isInserted) {

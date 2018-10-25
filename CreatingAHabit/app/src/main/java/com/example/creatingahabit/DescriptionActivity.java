@@ -15,8 +15,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Calendar;
 
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
@@ -30,6 +33,7 @@ public class DescriptionActivity extends AppCompatActivity {
     TextView desc;
     String name;
     Dialog dialog;
+    CalendarView calendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,7 @@ public class DescriptionActivity extends AppCompatActivity {
         myDB = new DatabaseHelper(this);
         freq = findViewById(R.id.text_frequency);
         desc = findViewById(R.id.text_description);
+        calendar = findViewById(R.id.calendarView);
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
@@ -63,9 +68,9 @@ public class DescriptionActivity extends AppCompatActivity {
     }
 
     public void showInfo(String name) {
-        int ID = myDB.returnID(name);
+        int ID = myDB.returnIDFromHT(name);
         Log.d("E", "ID is:" + ID);
-        Cursor cursor = myDB.getItem(String.valueOf(ID));
+        Cursor cursor = myDB.getRecordFromHT(String.valueOf(ID));
         if(cursor.getCount() == 0) {
             Toast.makeText(this, "No data to show", Toast.LENGTH_SHORT).show();
         }
@@ -122,11 +127,13 @@ public class DescriptionActivity extends AppCompatActivity {
         dialog.show();
     }
     public void delete() {
-        if(myDB.deleteData(String.valueOf(myDB.returnID(name)))) {
+        if(myDB.deleteFromHT(String.valueOf(myDB.returnIDFromHT(name)))) {
             Intent intent = new Intent(this, MainActivity.class);
             myDB.close();
             startActivity(intent);
             Toast.makeText(DescriptionActivity.this, "Habit deleted", Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(DescriptionActivity.this, "Habit NOT deleted", Toast.LENGTH_LONG).show();
         }
     }
 }

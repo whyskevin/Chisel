@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void viewList() {
-        Cursor cursor = myDB.viewData();
+        Cursor cursor = myDB.readAllDataHT();
         if(cursor.getCount() == 0) {
             Toast.makeText(this, "No data to show", Toast.LENGTH_SHORT).show();
         }
@@ -306,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                Cursor res = myDB.getAllData();
+                Cursor res = myDB.getAllDataHT();
                 if(res.getCount() == 0){ //A table with empty rows will not have any data
                     showMessage("Error", "Nothing found");
                 }
