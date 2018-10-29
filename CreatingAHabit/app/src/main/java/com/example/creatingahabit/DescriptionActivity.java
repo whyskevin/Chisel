@@ -3,10 +3,12 @@ package com.example.creatingahabit;
 import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.EventLog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,9 +17,22 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.DayViewFacade;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+
+import org.threeten.bp.DayOfWeek;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+
+import static android.Manifest.permission_group.CALENDAR;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 
@@ -52,6 +67,24 @@ public class DescriptionActivity extends AppCompatActivity {
             showInfo(name);
         }
         dialog = new Dialog(this);
+
+        MaterialCalendarView materialCalendarView = findViewById(R.id.calendarView);
+        materialCalendarView.state().edit()
+                .setFirstDayOfWeek(DayOfWeek.MONDAY)
+                .commit();
+
+
+
+        Collection<CalendarDay> test = new ArrayList<>();
+        materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
+                Toast.makeText(DescriptionActivity.this, "" + calendarDay, Toast.LENGTH_SHORT).show();
+                test.add(calendarDay);
+                materialCalendarView.addDecorator(new EventDecorator(0, test));
+
+            }
+        });
     }
 
     @Override

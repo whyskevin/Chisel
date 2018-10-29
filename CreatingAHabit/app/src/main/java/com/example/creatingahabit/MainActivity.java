@@ -24,6 +24,9 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         adapter = new myListAdapter( this, R.layout.list_item, listItem);
         userList.setAdapter(adapter);
 
+        MaterialCalendarView materialCalendarView = findViewById(R.id.calendarView);
+        materialCalendarView.setTopbarVisible(false);
         //button = (Button) findViewById(R.id.displayHabits);
 
         //viewAll();
