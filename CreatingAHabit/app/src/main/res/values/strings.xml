@@ -17,10 +17,10 @@
 
 
     <string-array name="frequency_spinner_array">
-        <item>Day</item>
-        <item>Week</item>
-        <item>Month</item>
-        <item>Year</item>
+        <item>day</item>
+        <item>week</item>
+        <item>month</item>
+        <item>year</item>
     </string-array>
 
 

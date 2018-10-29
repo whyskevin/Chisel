@@ -3,6 +3,8 @@ package com.example.creatingahabit;
 import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -70,19 +72,26 @@ public class DescriptionActivity extends AppCompatActivity {
 
         MaterialCalendarView materialCalendarView = findViewById(R.id.calendarView);
         materialCalendarView.state().edit()
-                .setFirstDayOfWeek(DayOfWeek.MONDAY)
                 .commit();
 
 
 
-        Collection<CalendarDay> test = new ArrayList<>();
+        Collection<CalendarDay> completed = new ArrayList<>();
+        Collection<CalendarDay> notCompleted = new ArrayList<>();
         materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
                 Toast.makeText(DescriptionActivity.this, "" + calendarDay, Toast.LENGTH_SHORT).show();
-                test.add(calendarDay);
-                materialCalendarView.addDecorator(new EventDecorator(0, test));
-
+                if(completed.contains(calendarDay)) {
+                    completed.remove(calendarDay);
+                    notCompleted.add(calendarDay);
+                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+                }
+                else {
+                    completed.add(calendarDay);
+                    notCompleted.remove(calendarDay);
+                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+                }
             }
         });
     }
