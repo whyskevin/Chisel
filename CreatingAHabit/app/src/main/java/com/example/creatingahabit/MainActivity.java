@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.Collection;
 import java.util.ArrayList;
 
 import android.content.Context;
@@ -24,6 +25,13 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarViewInitProvider;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+
+import java.util.HashSet;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     ListView userList;
     ArrayList<String> listItem;
     ArrayAdapter adapter;
+    Collection<CalendarDay> calendarDates;
 
     DescriptionActivity sm;
 
@@ -44,10 +53,11 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
 
         myDB = new DatabaseHelper(this);
+        calendarDates = new HashSet<>();
         listItem = new ArrayList<>();
         userList = findViewById(R.id.user_list);
         viewList();
-        adapter = new myListAdapter( this, R.layout.list_item, listItem);
+        adapter = new myListAdapter( this, R.layout.list_item_mcv, listItem);
         userList.setAdapter(adapter);
 
         //button = (Button) findViewById(R.id.displayHabits);
@@ -100,205 +110,34 @@ public class MainActivity extends AppCompatActivity {
             super(context, resource, objects);
             layout = resource;
         }
-
-        @NonNull
         @Override
-        public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent)
-        {
-            ViewHolder mainViewHolder = null;
-            if (convertView == null){
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater = LayoutInflater.from(getContext());
 
-                LayoutInflater inflater = LayoutInflater.from(getContext());
-                convertView = inflater.inflate(layout, parent, false);
-                final ViewHolder viewHolder = new ViewHolder();
-                viewHolder.title = (TextView) convertView.findViewById(R.id.textView);
+            convertView = inflater.inflate(R.layout.list_item_mcv,parent, false);
+            //Holds list_item views
+            final ViewHolder viewHolder = new ViewHolder();
 
-                viewHolder.title.setText(getItem(position).toString());
-                viewHolder.buttonMon = (Button) convertView.findViewById(R.id.button);
-                viewHolder.buttonMon.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
-                    @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonMon.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
-                        }
-                        else if (i == 1){
-                            viewHolder.buttonMon.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonMon.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonMon.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
-                viewHolder.buttonTues = (Button) convertView.findViewById(R.id.button1);
-                viewHolder.buttonTues.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
-                    @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonTues.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
-                        }
-                        else if (i == 1){
-                            viewHolder.buttonTues.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonTues.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonTues.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
-
-                viewHolder.buttonWed = (Button) convertView.findViewById(R.id.button2);
-                viewHolder.buttonWed.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
-                    @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonWed.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
-                        }
-                        else if (i == 1){
-                            viewHolder.buttonWed.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonWed.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonWed.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
-                viewHolder.buttonThur = (Button) convertView.findViewById(R.id.button3);
-                viewHolder.buttonThur.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
-                    @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonThur.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
-                        }
-                        else if (i == 1){
-                            viewHolder.buttonThur.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonThur.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonThur.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
-                viewHolder.buttonFri = (Button) convertView.findViewById(R.id.button4);
-                viewHolder.buttonFri.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
-                    @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonFri.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
-                        }
-                        else if (i == 1){
-                            viewHolder.buttonFri.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonFri.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonFri.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
-                viewHolder.buttonSat = (Button) convertView.findViewById(R.id.button5);
-                viewHolder.buttonSat.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
-                    @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonSat.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
-                        }
-                        else if (i == 1){
-                            viewHolder.buttonSat.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonSat.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonSat.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
-                viewHolder.buttonSun = (Button) convertView.findViewById(R.id.button6);
-                viewHolder.buttonSun.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
-                    @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonSun.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
-                        }
-                        else if (i == 1){
-                            viewHolder.buttonSun.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonSun.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonSun.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
-
-
-                convertView.setTag(viewHolder);
-            }
-            else{
-
-                mainViewHolder = (ViewHolder) convertView.getTag();
-                mainViewHolder.title.setText(getItem(position).toString());
-            }
+            viewHolder.title = (TextView) convertView.findViewById(R.id.list_item_habit_name);
+            viewHolder.calendar = (MaterialCalendarView) convertView.findViewById(R.id.calendarView);
+            viewHolder.calendar.setTopbarVisible(false);
+            viewHolder.calendar.setOnDateChangedListener(new OnDateSelectedListener() {
+                @Override
+                public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay selectedDay, boolean b) {
+                    //For the selected calendar, we can get the selected CalendarDay
+                    calendarDates.add(selectedDay);
+//                    materialCalendarView.addDecorator(new EventDecorator(0, test));
+                    //Add selected date to the database
+                }
+            });
+            viewHolder.title.setText(getItem(position).toString());
             return convertView;
         }
-
-
     }
+
     public class ViewHolder {
         TextView title;
-        Button buttonMon;
-        Button buttonTues;
-        Button buttonWed;
-        Button buttonThur;
-        Button buttonFri;
-        Button buttonSat;
-        Button buttonSun;
+        MaterialCalendarView calendar;
     }
 
     public void viewAll() {

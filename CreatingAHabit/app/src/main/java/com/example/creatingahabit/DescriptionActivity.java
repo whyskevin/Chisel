@@ -18,6 +18,19 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
 import android.widget.Toast;
+//MaterialCalendarView imports
+import java.util.Collection;
+import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
+import com.prolificinteractive.materialcalendarview.DayViewDecorator;
+import com.prolificinteractive.materialcalendarview.DayViewFacade;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.spans.DotSpan;
+
 
 import java.util.Calendar;
 
@@ -33,7 +46,8 @@ public class DescriptionActivity extends AppCompatActivity {
     TextView desc;
     String name;
     Dialog dialog;
-    CalendarView calendar;
+    MaterialCalendarView calendar;
+    private ArrayList<CalendarDay> markedDates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +62,8 @@ public class DescriptionActivity extends AppCompatActivity {
         myDB = new DatabaseHelper(this);
         freq = findViewById(R.id.text_frequency);
         desc = findViewById(R.id.text_description);
-        calendar = findViewById(R.id.calendarView);
+        calendar = (MaterialCalendarView)findViewById(R.id.calendarView);
+        markedDates = new ArrayList<>();
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
@@ -57,6 +72,8 @@ public class DescriptionActivity extends AppCompatActivity {
             showInfo(name);
         }
         dialog = new Dialog(this);
+
+        markDateTest();
     }
 
     @Override
@@ -136,4 +153,38 @@ public class DescriptionActivity extends AppCompatActivity {
             Toast.makeText(DescriptionActivity.this, "Habit NOT deleted", Toast.LENGTH_LONG).show();
         }
     }
+
+    public void markDateTest(){
+
+//            calendar.set(2018, 10  , 25);
+            CalendarDay day = CalendarDay.from(2018,10,30);
+            markedDates.add(day);
+            int myColor = 0xff0000ff;
+
+        calendar.addDecorator(new EventDecorator(myColor, markedDates));
+
+    }
+    private class EventDecorator implements DayViewDecorator {
+
+        private final int color;
+//        private CalendarDay d;
+        private final HashSet<CalendarDay> dates;
+
+        public EventDecorator(int color, ArrayList<CalendarDay> date) {
+            this.color = color;
+            this.dates = new HashSet<CalendarDay>(date);
+        }
+
+        @Override
+        public boolean shouldDecorate(CalendarDay day) {
+            return dates.contains(day);
+//            return true;
+        }
+
+        @Override
+        public void decorate(DayViewFacade view) {
+            view.addSpan(new DotSpan(5, color));
+        }
+    }
+
 }
