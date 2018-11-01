@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateLongClickListener;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import org.threeten.bp.DayOfWeek;
@@ -78,9 +79,9 @@ public class DescriptionActivity extends AppCompatActivity {
 
         Collection<CalendarDay> completed = new ArrayList<>();
         Collection<CalendarDay> notCompleted = new ArrayList<>();
-        materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+        materialCalendarView.setOnDateLongClickListener(new OnDateLongClickListener() {
             @Override
-            public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
+            public void onDateLongClick(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay) {
                 Toast.makeText(DescriptionActivity.this, "" + calendarDay, Toast.LENGTH_SHORT).show();
                 if(completed.contains(calendarDay)) {
                     completed.remove(calendarDay);
@@ -94,6 +95,22 @@ public class DescriptionActivity extends AppCompatActivity {
                 }
             }
         });
+//        materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+//            @Override
+//            public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
+//                Toast.makeText(DescriptionActivity.this, "" + calendarDay, Toast.LENGTH_SHORT).show();
+//                if(completed.contains(calendarDay)) {
+//                    completed.remove(calendarDay);
+//                    notCompleted.add(calendarDay);
+//                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+//                }
+//                else {
+//                    completed.add(calendarDay);
+//                    notCompleted.remove(calendarDay);
+//                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+//                }
+//            }
+//        });
     }
 
     @Override

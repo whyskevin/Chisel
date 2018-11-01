@@ -21,8 +21,10 @@
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="30dp"
-            app:mcv_selectionColor="#00F"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:layout_marginTop="10dp"
+            app:mcv_selectionColor="@color/colorPrimary"
             app:mcv_showOtherDates="all" />
 
         <TextView

@@ -1,5 +1,6 @@
 package com.example.creatingahabit;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -98,10 +100,10 @@ public class EditHabitActivity extends AppCompatActivity implements AdapterView.
 
     public static int returnSpinnerColumn(String selection){
         HashMap<String, Integer> map = new HashMap<>();
-        map.put("Day", 0);
-        map.put("Week", 1);
-        map.put("Month",2);
-        map.put("Year",3);
+        map.put("day", 0);
+        map.put("week", 1);
+        map.put("month",2);
+        map.put("year",3);
         return map.get(selection);
     }
 
@@ -156,5 +158,9 @@ public class EditHabitActivity extends AppCompatActivity implements AdapterView.
         return false;
     }
 
+    public void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
 }
