@@ -37,7 +37,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public static final String CREATE_TABLE_HABIT_TABLE = "CREATE TABLE " + HT_NAME + " ( " + HABIT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + HABIT_NAME + " TEXT UNIQUE, "
                                                                                             + HABIT_DESCRIPTION + " TEXT, " + HABIT_FREQUENCY + " INTEGER, " + HABIT_TIME_PERIOD + " TEXT )";
 
-    public static String CREATE_TABLE_HABIT_RECORD = "CREATE TABLE " + HR_NAME + " ( " + HR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + DATE + " TEXT UNIQUE, " + COMPLETE + " INTEGER, " + NOTE + " TEXT )";
+    public static String CREATE_TABLE_HABIT_RECORD = "CREATE TABLE " + HR_NAME + " ( " + HR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + DATE + " TEXT, " + COMPLETE + " INTEGER, " + NOTE + " TEXT )";
 
 
     //Constructor
@@ -186,6 +186,30 @@ public class DatabaseHelper extends SQLiteOpenHelper
             Log.d("I", "Inserted:" + contentValues.toString());
             return true;
         }
+    }
+
+    public void checkCompletion(int habit_ID, String date, boolean completed){
+//        String tableName = "Table_" + String.valueOf(habit_ID);
+//        String check;
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        if(completed) {
+//            check = "IF EXISTS (SELECT * FROM " + tableName + " WHERE DATE = " + date + " ) "
+//                    + "BEGIN " +
+//                    " UPDATE  SET COMPLETED = 1 WHERE DATE = " + date + " END "
+//            + "  ELSE\n" +
+//                    "      BEGIN\n" +
+//                    "        INSERT INTO " + tableName + " (DATE, COMPLETE, NOTE) VALUES (" + date + ", 1, \" \") " +
+//                    "       END";
+//        }else{
+//            check = "IF EXISTS (SELECT * FROM " + tableName + " WHERE DATE = " + date + " ) "
+//                    + "BEGIN " +
+//                    " UPDATE  SET COMPLETED = 0 WHERE DATE = " + date + " END ";
+//                    + "  ELSE\n" +
+//                    "      BEGIN\n" +
+//                    "        INSERT INTO " + tableName + " (DATE, COMPLETE, NOTE) VALUES (" + date + ", 0, \" \") " +
+//                    "       END";
+//        }
+//        db.execSQL(check);
     }
 
     public boolean deleteFromHR(String habitName, String date){

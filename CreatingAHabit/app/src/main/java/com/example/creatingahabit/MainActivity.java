@@ -20,6 +20,7 @@ import android.widget.Toast;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.ArrayList;
+import android.util.Log;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -44,8 +45,9 @@ public class MainActivity extends AppCompatActivity {
     ListView userList;
     ArrayList<String> listItem;
     ArrayAdapter adapter;
-    TreeMap<Integer, ArrayList> habitsCalendarDates;
-//    Collection<CalendarDay> calendarDates;
+    TreeMap<Integer, ArrayList> completeCalendarDates;
+    TreeMap<Integer,ArrayList> incompleteCalendarDates;
+    //    Collection<CalendarDay> calendarDates;
 
     DescriptionActivity sm;
 
@@ -59,10 +61,11 @@ public class MainActivity extends AppCompatActivity {
         myDB = new DatabaseHelper(this);
 //        calendarDates = new HashSet<>();
         listItem = new ArrayList<>();
-        habitsCalendarDates = new TreeMap<>();
+        completeCalendarDates = new TreeMap<>();
+        incompleteCalendarDates = new TreeMap<>();
         userList = findViewById(R.id.user_list);
         viewList();
-        adapter = new myListAdapter( this, R.layout.list_item_mcv, listItem);
+        adapter = new myListAdapter( this, R.layout.list_item, listItem);
         userList.setAdapter(adapter);
 
         //button = (Button) findViewById(R.id.displayHabits);
@@ -94,7 +97,8 @@ public class MainActivity extends AppCompatActivity {
         else {
             while(cursor.moveToNext()) {
                 listItem.add(cursor.getString(1));  //col 1 is name, col 0 is id
-                habitsCalendarDates.put(Integer.valueOf(cursor.getString(0)), new ArrayList()); //TreeMap of (habitIDs, ArrayList)
+                completeCalendarDates.put(Integer.valueOf(cursor.getString(0)), new ArrayList()); //TreeMap of (habitIDs, ArrayList)
+                incompleteCalendarDates.put(Integer.valueOf(cursor.getString(0)), new ArrayList()); //TreeMap of (habitIDs, ArrayList)
             }
             adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listItem);
             userList.setAdapter(adapter);
@@ -107,6 +111,13 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(appInfo);
                 }
             });
+        }
+        //Retrieve each habit's marked dates
+
+        if(!listItem.isEmpty()){
+            for(int i = 0; i < listItem.size(); i++){
+                
+            }
         }
     }
 
@@ -132,11 +143,25 @@ public class MainActivity extends AppCompatActivity {
                 public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay selectedDay, boolean b) {
                     //For the selected calendar, we can get the selected CalendarDay
                     Toast.makeText(MainActivity.this, "" + selectedDay, Toast.LENGTH_SHORT).show();
+
                     int habit_ID = myDB.returnIDFromHT(viewHolder.title.getText().toString());
-                    ArrayList<CalendarDay> clickedCalendarDates = habitsCalendarDates.get(habit_ID);
-                    clickedCalendarDates.add(selectedDay);
-                    myDB.insertDataToHR("Table_" + habit_ID, selectedDay.getDate().toString(), "1", "");
-                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), clickedCalendarDates));
+
+                    //Retrieves the arraylist assigned to that habit
+                    ArrayList<CalendarDay> completed = completeCalendarDates.get(habit_ID);
+                    ArrayList<CalendarDay> notCompleted = incompleteCalendarDates.get(habit_ID);
+
+                    if(completed.contains(selectedDay)) {
+                        completed.remove(selectedDay);
+                        notCompleted.add(selectedDay);
+                        materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+                        myDB.checkCompletion(habit_ID, selectedDay.getDate().toString(), false);
+                    }else{
+                        completed.add(selectedDay);
+                        notCompleted.remove(selectedDay);
+                        materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+                        myDB.checkCompletion(habit_ID, selectedDay.getDate().toString(), true);
+                    }
+//                    myDB.insertDataToHR("Table_" + habit_ID, selectedDay.getDate().toString(), "1", "");
                     //Add selected date to the database
 
                 }
