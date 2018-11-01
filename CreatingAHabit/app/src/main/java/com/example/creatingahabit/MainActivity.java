@@ -2,6 +2,7 @@ package com.example.creatingahabit;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.ArrayList;
 
@@ -33,6 +35,7 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,7 +44,8 @@ public class MainActivity extends AppCompatActivity {
     ListView userList;
     ArrayList<String> listItem;
     ArrayAdapter adapter;
-    Collection<CalendarDay> calendarDates;
+    TreeMap<Integer, ArrayList> habitsCalendarDates;
+//    Collection<CalendarDay> calendarDates;
 
     DescriptionActivity sm;
 
@@ -53,8 +57,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
 
         myDB = new DatabaseHelper(this);
-        calendarDates = new HashSet<>();
+//        calendarDates = new HashSet<>();
         listItem = new ArrayList<>();
+        habitsCalendarDates = new TreeMap<>();
         userList = findViewById(R.id.user_list);
         viewList();
         adapter = new myListAdapter( this, R.layout.list_item_mcv, listItem);
@@ -89,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         else {
             while(cursor.moveToNext()) {
                 listItem.add(cursor.getString(1));  //col 1 is name, col 0 is id
+                habitsCalendarDates.put(Integer.valueOf(cursor.getString(0)), new ArrayList()); //TreeMap of (habitIDs, ArrayList)
             }
             adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listItem);
             userList.setAdapter(adapter);
@@ -125,9 +131,14 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay selectedDay, boolean b) {
                     //For the selected calendar, we can get the selected CalendarDay
-                    calendarDates.add(selectedDay);
-//                    materialCalendarView.addDecorator(new EventDecorator(0, test));
+                    Toast.makeText(MainActivity.this, "" + selectedDay, Toast.LENGTH_SHORT).show();
+                    int habit_ID = myDB.returnIDFromHT(viewHolder.title.getText().toString());
+                    ArrayList<CalendarDay> clickedCalendarDates = habitsCalendarDates.get(habit_ID);
+                    clickedCalendarDates.add(selectedDay);
+                    myDB.insertDataToHR("Table_" + habit_ID, selectedDay.getDate().toString(), "1", "");
+                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), clickedCalendarDates));
                     //Add selected date to the database
+
                 }
             });
             viewHolder.title.setText(getItem(position).toString());

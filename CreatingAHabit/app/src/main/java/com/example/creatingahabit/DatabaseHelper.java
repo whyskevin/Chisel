@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.strictmode.SqliteObjectLeakedViolation;
 import android.util.Log;
 import android.widget.Toast;
+import java.util.Calendar;
+import java.util.Date;
 
 public class DatabaseHelper extends SQLiteOpenHelper
 {
@@ -90,6 +92,10 @@ public class DatabaseHelper extends SQLiteOpenHelper
             //Creates a Habit_Record of the habit name
             CREATE_TABLE_HABIT_RECORD = "CREATE TABLE " + HR_NAME + " ( " + HR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + DATE + " TEXT UNIQUE, " + COMPLETE + " INTEGER, " + NOTE + " TEXT )";
             db.execSQL(CREATE_TABLE_HABIT_RECORD);
+            Date currentTime = Calendar.getInstance().getTime();
+            //Inserts first row. This is holds the current date
+            Log.d("I", "INSERT_HT: TODAY'S DATE IS " + currentTime.toString());
+            insertDataToHR(HR_NAME, currentTime.toString(), "0", "");
             return true;
         }
 
@@ -162,22 +168,22 @@ public class DatabaseHelper extends SQLiteOpenHelper
         HR_NAME = newTableName;
     }
 
-    public boolean insertDataToHR(String habitName, String date, String completed, String note){
-        String habitRecordName = String.valueOf(returnIDFromHT(habitName));
+    public boolean insertDataToHR(String tableName, String date, String completed, String note){
+//        String habitRecordName = habit_ID;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        if(habitName.equals("") || date.equals("")) {
+        if(tableName.equals("") || date.equals("")) {
             return false;
         }
         contentValues.put(DATE, date);
         contentValues.put(COMPLETE, Integer.parseInt(completed));
         contentValues.put(NOTE, note);
 
-        long result =  db.insert(habitRecordName, null, contentValues); //Returns -1 if data is not inserted
+        long result =  db.insert(tableName, null, contentValues); //Returns -1 if data is not inserted
         if(result == -1)
             return false;
         else {
-            System.out.println("Inserted:" + contentValues.toString());
+            Log.d("I", "Inserted:" + contentValues.toString());
             return true;
         }
     }
