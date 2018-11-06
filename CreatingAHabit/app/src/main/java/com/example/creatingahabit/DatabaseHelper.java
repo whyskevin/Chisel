@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.strictmode.SqliteObjectLeakedViolation;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -31,6 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public static final String HR_ID = "HR_ID"; //Don't know the significance of having this. Each record will have an unique date that can be used as a key
     public static final String DATE = "DATE";
     public static final String COMPLETE = "COMPLETE";
+
     public static final String NOTE = "NOTE";
 
     //Create Table Statements
@@ -42,7 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     //Constructor
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, 5);}
+        super(context, DATABASE_NAME, null, 8);}
 
     /*
     Purpose: Create a DB Helper object to manage a SQLITE database.
@@ -60,13 +63,25 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + HT_NAME, null);
+        if(cursor.getCount() == 0){ //A table with empty rows will not have any data
+            Log.d("E", "Nothing found");
+        }
+        else {
+            while (cursor.moveToNext()){ //Grabs records from the table
+                String habitID = cursor.getString(0);
+                sqLiteDatabase.execSQL("DROP TABLE IF EXISTS Table_" + habitID );
+            }
+        }
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + HT_NAME );
+        cursor.close();
         onCreate(sqLiteDatabase);
     }
 
     public void dropTable(String tableName){
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("DROP TABLE " + tableName + " ");
+        db.execSQL("DROP TABLE " + tableName);
+
     }
 
     //-----Habit_Table methods-----
@@ -86,16 +101,18 @@ public class DatabaseHelper extends SQLiteOpenHelper
         if(result == -1)
             return false;
         else {
-            System.out.println("Inserted:" + contentValues.toString());
+            Log.d("E","Inserted:" + contentValues.toString());
             //Once the Habit is inserted into the Habit_Table, we need to create a Habit_Record for it.
             HR_NAME = "Table_" + Integer.toString(returnIDFromHT(name)); //Given the habit's name, we query for the ID PK. This will be the name of the new table.
             //Creates a Habit_Record of the habit name
-            CREATE_TABLE_HABIT_RECORD = "CREATE TABLE " + HR_NAME + " ( " + HR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + DATE + " TEXT UNIQUE, " + COMPLETE + " INTEGER, " + NOTE + " TEXT )";
+            Log.d("E","Now insert " + HR_NAME);
+            CREATE_TABLE_HABIT_RECORD = "CREATE TABLE " + HR_NAME + " ( " + HR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + DATE + " TEXT, " + COMPLETE + " INTEGER, " + NOTE + " TEXT )";
             db.execSQL(CREATE_TABLE_HABIT_RECORD);
-            Date currentTime = Calendar.getInstance().getTime();
-            //Inserts first row. This is holds the current date
-            Log.d("I", "INSERT_HT: TODAY'S DATE IS " + currentTime.toString());
-            insertDataToHR(HR_NAME, currentTime.toString(), "0", "");
+            String firstDay = new SimpleDateFormat("yyyy-MM-dd").format(Calendar.getInstance().getTime());
+
+//            //Inserts first row. This is holds the current date
+//            Log.d("I", "INSERT_HT: TODAY'S DATE IS " + firstDay);
+//            insertDataToHR(HR_NAME, firstDay, "0", "First day!");
             return true;
         }
 
@@ -119,7 +136,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         int result = db.delete(HT_NAME, HABIT_ID + " = '" + ID + "'", null); //Returns # of affected rows. Checks > 0 to see if SQL worked
         if(result > 0){ //The row was deleted. Now we must delete the Habit_Records table
             Log.d("E", "Success! ID" + ID + " was deleted!");
-            dropTable("Table_" + ID);
+            dropTable("Table_" + ID);     //Must watch out for Table_ID that do not exist in the database
         }else{
             Log.d("E", "Error: " + ID + " was not deleted. Check corresponding Habit_Record.");
         }
@@ -145,11 +162,13 @@ public class DatabaseHelper extends SQLiteOpenHelper
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT " + HABIT_ID + " FROM " + HT_NAME + " WHERE " + HABIT_NAME  + " = '" + name + "'";
         Cursor cursor = db.rawQuery(query,null);
-        if(cursor.getCount() == 0){ //A table with empty rows will not have any data
+        if(cursor.getCount() != 0){ //A table with empty rows will not have any data
+            cursor.moveToFirst();
+            return cursor.getInt(cursor.getColumnIndex("ID"));
+        }else {
             Log.d("E", "Error: No ID found to be returned!");
+            return 0;
         }
-        cursor.moveToFirst();
-        return cursor.getInt(cursor.getColumnIndex("ID"));
     }
 
     //Habit_Table Accessor Function
@@ -188,28 +207,16 @@ public class DatabaseHelper extends SQLiteOpenHelper
         }
     }
 
-    public void checkCompletion(int habit_ID, String date, boolean completed){
-//        String tableName = "Table_" + String.valueOf(habit_ID);
-//        String check;
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        if(completed) {
-//            check = "IF EXISTS (SELECT * FROM " + tableName + " WHERE DATE = " + date + " ) "
-//                    + "BEGIN " +
-//                    " UPDATE  SET COMPLETED = 1 WHERE DATE = " + date + " END "
-//            + "  ELSE\n" +
-//                    "      BEGIN\n" +
-//                    "        INSERT INTO " + tableName + " (DATE, COMPLETE, NOTE) VALUES (" + date + ", 1, \" \") " +
-//                    "       END";
-//        }else{
-//            check = "IF EXISTS (SELECT * FROM " + tableName + " WHERE DATE = " + date + " ) "
-//                    + "BEGIN " +
-//                    " UPDATE  SET COMPLETED = 0 WHERE DATE = " + date + " END ";
-//                    + "  ELSE\n" +
-//                    "      BEGIN\n" +
-//                    "        INSERT INTO " + tableName + " (DATE, COMPLETE, NOTE) VALUES (" + date + ", 0, \" \") " +
-//                    "       END";
-//        }
-//        db.execSQL(check);
+    public void updateCompletion (String habitName, String date, boolean b){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query;
+        int r = returnIDFromHT(habitName);
+        if(b){
+          query = "UPDATE Table_" + r + " SET COMPLETE = 1 WHERE DATE = '" + date + "'";
+        }else {
+            query = "UPDATE Table_" + r + " SET COMPLETE = 0 WHERE DATE = '" + date + "'";
+        }
+        db.execSQL(query);
     }
 
     public boolean deleteFromHR(String habitName, String date){
@@ -220,14 +227,22 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     public Cursor getAllDataHR(String habitName){
         SQLiteDatabase db = this.getWritableDatabase();
-        String habitRecordName = String.valueOf(returnIDFromHT(habitName));
-        return db.rawQuery("SELECT * FROM " + habitRecordName, null);
+        String habitTableName = "Table_" + String.valueOf(returnIDFromHT(habitName));
+        return db.rawQuery("SELECT * FROM " + habitTableName, null);
     }
 
     public Cursor getRecordFromHR(String habitName, String date){
         SQLiteDatabase db = this.getWritableDatabase();
         String habitRecordName = String.valueOf(returnIDFromHT(habitName));
-        return db.rawQuery("SELECT * FROM " + habitRecordName + " WHERE DATE = " + date, null );
+        String query = "SELECT * FROM Table_" + habitRecordName + " WHERE DATE = '" + date + "'";
+        Cursor c = db.rawQuery(query, null );
+        Log.d("I", "Run query: " + query);
+        c.moveToFirst();
+        if(c.getCount() == 0){
+            Log.d("I", "cursor empty in grHR");
+        }else
+            Log.d("I", "cursor has in grHR");
+        return c;
     }
 
 }

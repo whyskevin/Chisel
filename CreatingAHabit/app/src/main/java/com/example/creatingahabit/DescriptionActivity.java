@@ -3,10 +3,14 @@ package com.example.creatingahabit;
 import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.EventLog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,22 +22,20 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
 import android.widget.Toast;
-//MaterialCalendarView imports
-import java.util.Collection;
-import java.util.Date;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 
-import com.prolificinteractive.materialcalendarview.DayViewDecorator;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
-import com.prolificinteractive.materialcalendarview.CalendarDay;
-import com.prolificinteractive.materialcalendarview.spans.DotSpan;
+import com.prolificinteractive.materialcalendarview.OnDateLongClickListener;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
+import org.threeten.bp.DayOfWeek;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 
+import static android.Manifest.permission_group.CALENDAR;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 
@@ -46,8 +48,6 @@ public class DescriptionActivity extends AppCompatActivity {
     TextView desc;
     String name;
     Dialog dialog;
-    MaterialCalendarView calendar;
-    private ArrayList<CalendarDay> markedDates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +62,6 @@ public class DescriptionActivity extends AppCompatActivity {
         myDB = new DatabaseHelper(this);
         freq = findViewById(R.id.text_frequency);
         desc = findViewById(R.id.text_description);
-        calendar = (MaterialCalendarView)findViewById(R.id.calendarView);
-        markedDates = new ArrayList<>();
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
@@ -73,7 +71,46 @@ public class DescriptionActivity extends AppCompatActivity {
         }
         dialog = new Dialog(this);
 
-        markDateTest();
+        MaterialCalendarView materialCalendarView = findViewById(R.id.calendarView);
+        materialCalendarView.state().edit()
+                .commit();
+
+
+
+        Collection<CalendarDay> completed = new ArrayList<>();
+        Collection<CalendarDay> notCompleted = new ArrayList<>();
+        materialCalendarView.setOnDateLongClickListener(new OnDateLongClickListener() {
+            @Override
+            public void onDateLongClick(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay) {
+//                Toast.makeText(DescriptionActivity.this, "" + calendarDay, Toast.LENGTH_SHORT).show();
+//                if(completed.contains(calendarDay)) {
+//                    completed.remove(calendarDay);
+//                    notCompleted.add(calendarDay);
+//                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+//                }
+//                else {
+//                    completed.add(calendarDay);
+//                    notCompleted.remove(calendarDay);
+//                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+//                }
+            }
+        });
+//        materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+//            @Override
+//            public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
+//                Toast.makeText(DescriptionActivity.this, "" + calendarDay, Toast.LENGTH_SHORT).show();
+//                if(completed.contains(calendarDay)) {
+//                    completed.remove(calendarDay);
+//                    notCompleted.add(calendarDay);
+//                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+//                }
+//                else {
+//                    completed.add(calendarDay);
+//                    notCompleted.remove(calendarDay);
+//                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+//                }
+//            }
+//        });
     }
 
     @Override
@@ -111,6 +148,11 @@ public class DescriptionActivity extends AppCompatActivity {
         startActivity(editIntent);
     }
 
+    public void populateCalendar(){
+//        Cursor cs = myDB.getReadableDatabase();
+
+    }
+
     public void clickDelete(View view) {
         TextView txtclose;
         Button yes, no;
@@ -131,6 +173,7 @@ public class DescriptionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
+//                myDB.dropTable("Table_20");
                 delete();
             }
         });
@@ -143,48 +186,19 @@ public class DescriptionActivity extends AppCompatActivity {
         });
         dialog.show();
     }
+
     public void delete() {
-        if(myDB.deleteFromHT(String.valueOf(myDB.returnIDFromHT(name)))) {
+        int habitID = myDB.returnIDFromHT(name);
+//        myDB.dropTable("Table_"+habitID);
+//        if(myDB.deleteFromHT(String.valueOf(habitID))) {
+//            Log.d("E", "was deleted");
+//        }else
+//            Log.d("E", "wasn't deleted");
+        if(myDB.deleteFromHT(String.valueOf(habitID))) {
             Intent intent = new Intent(this, MainActivity.class);
             myDB.close();
             startActivity(intent);
             Toast.makeText(DescriptionActivity.this, "Habit deleted", Toast.LENGTH_LONG).show();
-        }else{
-            Toast.makeText(DescriptionActivity.this, "Habit NOT deleted", Toast.LENGTH_LONG).show();
         }
     }
-
-    public void markDateTest(){
-
-//            calendar.set(2018, 10  , 25);
-            CalendarDay day = CalendarDay.from(2018,10,30);
-            markedDates.add(day);
-            int myColor = 0xff0000ff;
-
-        calendar.addDecorator(new EventDecorator(myColor, markedDates));
-
-    }
-    private class EventDecorator implements DayViewDecorator {
-
-        private final int color;
-//        private CalendarDay d;
-        private final HashSet<CalendarDay> dates;
-
-        public EventDecorator(int color, ArrayList<CalendarDay> date) {
-            this.color = color;
-            this.dates = new HashSet<CalendarDay>(date);
-        }
-
-        @Override
-        public boolean shouldDecorate(CalendarDay day) {
-            return dates.contains(day);
-//            return true;
-        }
-
-        @Override
-        public void decorate(DayViewFacade view) {
-            view.addSpan(new DotSpan(5, color));
-        }
-    }
-
 }
