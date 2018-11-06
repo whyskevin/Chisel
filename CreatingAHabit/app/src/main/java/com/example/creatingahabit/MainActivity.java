@@ -67,16 +67,35 @@ public class MainActivity extends AppCompatActivity {
 
         myDB = new DatabaseHelper(this);
 //        calendarDates = new HashSet<>();
-        listItem = new ArrayList<>();
-        completeCalendarDates = new TreeMap<>();
-        incompleteCalendarDates = new TreeMap<>();
-        allCalendars = new Hashtable<>();
+        if(listItem == null)
+            listItem = new ArrayList<>();
+        if(completeCalendarDates == null)
+            completeCalendarDates = new TreeMap<>();
+        if(incompleteCalendarDates == null)
+            incompleteCalendarDates = new TreeMap<>();
+        if(allCalendars == null)
+            allCalendars = new Hashtable<>();
         userList = findViewById(R.id.user_list);
+
         viewList();
+
         adapter = new myListAdapter( this, R.layout.list_item, listItem);
         userList.setAdapter(adapter);
 
 
+        Cursor c = myDB.getAllDataHT();
+        if(c.getCount() > 0) {
+            while (c.moveToNext()) {
+                String habitName = c.getString(1);
+                Log.d("I", "populating " + habitName);
+                try {
+                    populateCalendar(habitName);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        c.close();
 
 
 //        Log.d("E", completeCalendarDates.get(0).toString());
@@ -169,15 +188,20 @@ public class MainActivity extends AppCompatActivity {
             convertView = inflater.inflate(R.layout.list_item_mcv,parent, false);
             //Holds list_item views
             final ViewHolder viewHolder = new ViewHolder();
-
             viewHolder.title = (TextView) convertView.findViewById(R.id.list_item_habit_name);
             viewHolder.calendar = (MaterialCalendarView) convertView.findViewById(R.id.calendarView);
+
             int ID = myDB.returnIDFromHT(viewHolder.title.toString());
+
+            // Key-Value (ID, Material Calendar View) stored in Hashtable
             allCalendars.put( ID, viewHolder.calendar);
+
             viewHolder.calendar.setTopbarVisible(false);
+
             viewHolder.calendar.setOnDateChangedListener(new OnDateSelectedListener() {
                 @Override
                 public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay selectedDay, boolean b) {
+
                     Cursor cursor = null;
                     //For the selected calendar, we can get the selected CalendarDay
                     Toast.makeText(MainActivity.this, "" + selectedDay, Toast.LENGTH_SHORT).show();
@@ -190,6 +214,8 @@ public class MainActivity extends AppCompatActivity {
                     ArrayList<CalendarDay> notCompleted = incompleteCalendarDates.get(habit_ID);
 
                     cursor = myDB.getRecordFromHR(habitName, selectedDay.getDate().toString());
+
+                    //Test output
                     if(cursor != null) {
                         StringBuffer buffer = new StringBuffer();
                         while (cursor.moveToNext()) { //Grabs records from the table
@@ -198,33 +224,41 @@ public class MainActivity extends AppCompatActivity {
                             buffer.append(cursor.getString(2));
                         }
                         Log.d("E", "Cursor holds" + buffer.toString());
+                    }else{
+                        Log.d("I", "Date does not exist in " + habitName);
                     }
+                    //Test output
+
 
                     //If the day has been complete, it now becomes incomplete
                     if(completed.contains(selectedDay)) {
                         completed.remove(selectedDay);
                         notCompleted.add(selectedDay);
                         materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
-                        //Add selected date to the database
+
+                        //Add selected date to the database. If exists, UPDATE else, INSERT FOR THE FIRST TIME
                         if(cursor.getCount() == 0){
                             myDB.insertDataToHR("Table_" + habit_ID, selectedDay.getDate().toString(), "0", "Incomplete");
                         }else {
                             myDB.updateCompletion(habitName, selectedDay.getDate().toString(), false);
                         }
                         Log.d("I", habitName + " has been set to incomplete");
+
                     }else{
                         completed.add(selectedDay);
                         notCompleted.remove(selectedDay);
                         materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
-                        //Add selected date to the database
+
+                        //Add selected date to the database. If exists, UPDATE else, INSERT FOR THE FIRST TIME
                         if(cursor.getCount() == 0){
                             myDB.insertDataToHR("Table_" + habit_ID, selectedDay.getDate().toString(), "1", "Complete");
                         }else{
                             myDB.updateCompletion(habitName, selectedDay.getDate().toString(), true);
                         }
+
                         Log.d("I", habitName + " has been set to complete");
                     }
-                    viewAllHR(habitName);
+//                    viewAllHR(habitName);
                     cursor.close();
                 }
             });
@@ -247,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
         if(cursor.getCount() == 0) {
             Toast.makeText(this, "No data in Table_" + habitID, Toast.LENGTH_SHORT).show();
         }
-        else if(cursor != null) {
+        else {
             while(cursor.moveToNext()) {
                 Date date = new SimpleDateFormat("yyyy-MM-dd").parse(cursor.getString(1));
                 Calendar cal = Calendar.getInstance();
@@ -257,18 +291,23 @@ public class MainActivity extends AppCompatActivity {
                 int day = cal.get(Calendar.DAY_OF_MONTH);
                 CalendarDay selectedDay = CalendarDay.from(year,month,day);
 
+                //Incomplete habit
                 if(Integer.valueOf(cursor.getString(2)) == 0){
                     Log.d("I", "Extracted habit " + habitName + " for " + selectedDay.toString() + " is incomplete") ;
-                    if(!notCompleted.contains(selectedDay))
+                    if(!notCompleted.contains(selectedDay)) {
                         notCompleted.add(selectedDay);
-                }else{ //The habit has been complete that day
+                        completed.remove(selectedDay);
+                    }
+                }else if (Integer.valueOf(cursor.getString(2)) > 0){ //The habit has been complete that day
                     Log.d("I", "Extracted habit " + habitName + " for " + selectedDay.toString() + " is complete") ;
-                    if(!completed.contains(selectedDay))
+                    if(!completed.contains(selectedDay)) {
                         completed.add(selectedDay);
+                        notCompleted.remove(selectedDay);
+                    }
                 }
-                }
-            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
-            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+            }
+//            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+//            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
             cursor.close();
             }
     }

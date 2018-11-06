@@ -33,7 +33,6 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public static final String HR_ID = "HR_ID"; //Don't know the significance of having this. Each record will have an unique date that can be used as a key
     public static final String DATE = "DATE";
     public static final String COMPLETE = "COMPLETE";
-
     public static final String NOTE = "NOTE";
 
     //Create Table Statements
