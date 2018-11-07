@@ -26,8 +26,13 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
+import org.threeten.bp.DayOfWeek;
+import org.threeten.bp.LocalDate;
+
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,8 +59,14 @@ public class MainActivity extends AppCompatActivity {
         adapter = new myListAdapter( this, R.layout.list_item, listItem);
         userList.setAdapter(adapter);
 
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
         MaterialCalendarView materialCalendarView = findViewById(R.id.calendarView);
         materialCalendarView.setTopbarVisible(false);
+        materialCalendarView.state().edit()
+                .setFirstDayOfWeek(DayOfWeek.of(day))
+                .commit();
+
         //button = (Button) findViewById(R.id.displayHabits);
 
         //viewAll();
