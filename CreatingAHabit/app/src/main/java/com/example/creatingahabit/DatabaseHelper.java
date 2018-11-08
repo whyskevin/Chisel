@@ -44,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     //Constructor
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, 8);}
+        super(context, DATABASE_NAME, null, 6);}
 
     /*
     Purpose: Create a DB Helper object to manage a SQLITE database.

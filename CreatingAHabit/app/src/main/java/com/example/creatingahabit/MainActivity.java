@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter adapter;
     TreeMap<Integer, ArrayList> completeCalendarDates;
     TreeMap<Integer,ArrayList> incompleteCalendarDates;
-    Hashtable<Integer, MaterialCalendarView> allCalendars;
+    static Hashtable<Integer, MaterialCalendarView>  allCalendars;
     //    Collection<CalendarDay> calendarDates;
 
     DescriptionActivity sm;
@@ -79,23 +79,20 @@ public class MainActivity extends AppCompatActivity {
 
         viewList();
 
-        adapter = new myListAdapter( this, R.layout.list_item, listItem);
-        userList.setAdapter(adapter);
 
-
-        Cursor c = myDB.getAllDataHT();
-        if(c.getCount() > 0) {
-            while (c.moveToNext()) {
-                String habitName = c.getString(1);
-                Log.d("I", "populating " + habitName);
-                try {
-                    populateCalendar(habitName);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        c.close();
+//        Cursor c = myDB.getAllDataHT();
+//        if(c.getCount() > 0) {
+//            while (c.moveToNext()) {
+//                String habitName = c.getString(1);
+//                Log.d("I", "populating " + habitName);
+//                try {
+//                    populateCalendar(habitName);
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//        c.close();
 
 
 //        Log.d("E", completeCalendarDates.get(0).toString());
@@ -143,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                 completeCalendarDates.put(ID, new ArrayList()); //TreeMap of (habitIDs, ArrayList)
                 incompleteCalendarDates.put(ID, new ArrayList()); //TreeMap of (habitIDs, ArrayList)
             }
-            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listItem);
+            adapter = new myListAdapter(this, R.layout.list_item_mcv, listItem);
             userList.setAdapter(adapter);
             //making view list buttons to take to different page
             userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -188,13 +185,18 @@ public class MainActivity extends AppCompatActivity {
             convertView = inflater.inflate(R.layout.list_item_mcv,parent, false);
             //Holds list_item views
             final ViewHolder viewHolder = new ViewHolder();
+            //System.out.println("BLAH: " + listItem.get(position) + "   ASODIAHSODIJASD");
             viewHolder.title = (TextView) convertView.findViewById(R.id.list_item_habit_name);
             viewHolder.calendar = (MaterialCalendarView) convertView.findViewById(R.id.calendarView);
 
-            int ID = myDB.returnIDFromHT(viewHolder.title.toString());
+            String blah = listItem.get(position);
+            //System.out.println("TITLEEEE    " + blah + " @#*(@#(@");
+            int ID = myDB.returnIDFromHT(listItem.get(position));
 
             // Key-Value (ID, Material Calendar View) stored in Hashtable
+            //System.out.println("ID: " + ID + " @#!@(*#&@!(*#&!@(#");
             allCalendars.put( ID, viewHolder.calendar);
+            //System.out.println(allCalendars.isEmpty() + "123123123@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
             viewHolder.calendar.setTopbarVisible(false);
 
@@ -247,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
                     }else{
                         completed.add(selectedDay);
                         notCompleted.remove(selectedDay);
-                        materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+                        materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));//shouldn't decorate here
 
                         //Add selected date to the database. If exists, UPDATE else, INSERT FOR THE FIRST TIME
                         if(cursor.getCount() == 0){
@@ -258,7 +260,12 @@ public class MainActivity extends AppCompatActivity {
 
                         Log.d("I", habitName + " has been set to complete");
                     }
-//                    viewAllHR(habitName);
+                    //viewAllHR(habitName);
+                    try {
+                        populateCalendar(materialCalendarView, completed, notCompleted);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                     cursor.close();
                 }
             });
@@ -275,9 +282,12 @@ public class MainActivity extends AppCompatActivity {
     public void populateCalendar(String habitName) throws ParseException {
     Cursor cursor = myDB.getAllDataHR(habitName);
     int habitID = myDB.returnIDFromHT(habitName);
-    ArrayList<CalendarDay> completed = completeCalendarDates.get(habitID);
-    ArrayList<CalendarDay> notCompleted = incompleteCalendarDates.get(habitID);
+    ArrayList<CalendarDay> completed = completeCalendarDates.get(habitID); //empty
+        System.out.println("YO IS THIS ARRAYLIST EMPTY?: " + completed.isEmpty());
+    ArrayList<CalendarDay> notCompleted = incompleteCalendarDates.get(habitID); //empty
+    System.out.println("calendar is empty: " + allCalendars.isEmpty() + "@@@@@@@@@@@@@@@@@@@@@@@@@");
     MaterialCalendarView materialCalendarView = allCalendars.get(habitID);
+    System.out.println("IS MATERIAL EMPTY? " + materialCalendarView);
         if(cursor.getCount() == 0) {
             Toast.makeText(this, "No data in Table_" + habitID, Toast.LENGTH_SHORT).show();
         }
@@ -306,11 +316,19 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-//            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
-//            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
             cursor.close();
             }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void populateCalendar(MaterialCalendarView test, ArrayList<CalendarDay> completed, ArrayList<CalendarDay> notCompleted) throws ParseException {
+        MaterialCalendarView materialCalendarView = test;
+        materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+        materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
