@@ -12,7 +12,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="0dp"></include>
+        tools:layout_editor_absoluteY="0dp"
+        tools:ignore="MissingConstraints"></include>
 
     <ListView
         android:id="@+id/user_list"

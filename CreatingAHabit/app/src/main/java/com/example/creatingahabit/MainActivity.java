@@ -1,5 +1,6 @@
 package com.example.creatingahabit;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.os.Parcel;
@@ -54,9 +56,8 @@ public class MainActivity extends AppCompatActivity {
     TreeMap<Integer, ArrayList> completeCalendarDates;
     TreeMap<Integer,ArrayList> incompleteCalendarDates;
     Hashtable<Integer, MaterialCalendarView> allCalendars;
+    SharedData sharedData;
     //    Collection<CalendarDay> calendarDates;
-
-    DescriptionActivity sm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,26 +77,36 @@ public class MainActivity extends AppCompatActivity {
         if(allCalendars == null)
             allCalendars = new Hashtable<>();
         userList = findViewById(R.id.user_list);
+        sharedData = SharedData.getInstance();
 
+        //Go into DB & get names of all habits in the HABIT_TABLE
         viewList();
 
-        adapter = new myListAdapter( this, R.layout.list_item, listItem);
-        userList.setAdapter(adapter);
+//        ListAdapter listA = new myListAdapter( this, R.layout.list_item, listItem);
+//        userList.setAdapter(listA);
 
+        View view = null;
+//        listA.getView(0,view, userList );
+//        Log.d("I","Size: " + idk.size());
 
-        Cursor c = myDB.getAllDataHT();
-        if(c.getCount() > 0) {
-            while (c.moveToNext()) {
-                String habitName = c.getString(1);
-                Log.d("I", "populating " + habitName);
-                try {
-                    populateCalendar(habitName);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        c.close();
+//        for(int i = 0; i < userList.getCount(); i++){
+//            View v = idk.get(i).findViewById(R.id.list_item_habit_name);
+//            Log.d("I", "View is: " + v.toString());
+//        }
+
+//        Cursor c = myDB.getAllDataHT();
+//        if(c.getCount() > 0) {
+//            while (c.moveToNext()) {
+//                String habitName = c.getString(1);
+//                Log.d("I", "populating " + habitName);
+//                try {
+//                    populateCalendar(habitName);
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//        c.close();
 
 
 //        Log.d("E", completeCalendarDates.get(0).toString());
@@ -143,8 +154,13 @@ public class MainActivity extends AppCompatActivity {
                 completeCalendarDates.put(ID, new ArrayList()); //TreeMap of (habitIDs, ArrayList)
                 incompleteCalendarDates.put(ID, new ArrayList()); //TreeMap of (habitIDs, ArrayList)
             }
-            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listItem);
+
+//            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listItem);
+//            userList.setAdapter(adapter);
+
+            adapter = new myListAdapter( this, R.layout.list_item, listItem);
             userList.setAdapter(adapter);
+
             //making view list buttons to take to different page
             userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -155,6 +171,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+//            Log.d("I", "After allCalendarss");
+//            Log.d("I", "allCalendar size is = " + allCalendars.size());
 
 
 //            for(int i = 0; i < listItem.size(); i++){
@@ -168,10 +186,18 @@ public class MainActivity extends AppCompatActivity {
         }
         //Retrieve each habit's marked dates
 
-        if(!listItem.isEmpty()){
-            for(int i = 0; i < listItem.size(); i++){
 
-            }
+//        ListAdapter listA = new myListAdapter( this, R.layout.list_item, listItem);
+//        userList.setAdapter(listA);
+
+
+
+
+        Log.d("I", "I'm at the end");
+
+        if(allCalendars.size() == 0){
+            Log.d("I", "allCalendar size I'm in onCreate = " + allCalendars.size() );
+
         }
     }
 
@@ -181,26 +207,28 @@ public class MainActivity extends AppCompatActivity {
             super(context, resource, objects);
             layout = resource;
         }
+
+//        @SuppressLint("ViewHolder")
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
-
             convertView = inflater.inflate(R.layout.list_item_mcv,parent, false);
+
             //Holds list_item views
+
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.title = (TextView) convertView.findViewById(R.id.list_item_habit_name);
             viewHolder.calendar = (MaterialCalendarView) convertView.findViewById(R.id.calendarView);
 
-            int ID = myDB.returnIDFromHT(viewHolder.title.toString());
-
-            // Key-Value (ID, Material Calendar View) stored in Hashtable
-            allCalendars.put( ID, viewHolder.calendar);
+            String habit_name = getItem(position).toString();
 
             viewHolder.calendar.setTopbarVisible(false);
 
             viewHolder.calendar.setOnDateChangedListener(new OnDateSelectedListener() {
                 @Override
                 public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay selectedDay, boolean b) {
+
+
 
                     Cursor cursor = null;
                     //For the selected calendar, we can get the selected CalendarDay
@@ -209,9 +237,15 @@ public class MainActivity extends AppCompatActivity {
                     String habitName = viewHolder.title.getText().toString();
                     int habit_ID = myDB.returnIDFromHT(viewHolder.title.getText().toString());
 
+                    MaterialCalendarView retrieval = allCalendars.get(habit_ID);
+                    if(retrieval == null){
+                        allCalendars.put(habit_ID, materialCalendarView);
+                    }
+
                     //Retrieves the arraylist assigned to that habit
                     ArrayList<CalendarDay> completed = completeCalendarDates.get(habit_ID);
                     ArrayList<CalendarDay> notCompleted = incompleteCalendarDates.get(habit_ID);
+
 
                     cursor = myDB.getRecordFromHR(habitName, selectedDay.getDate().toString());
 
@@ -262,7 +296,17 @@ public class MainActivity extends AppCompatActivity {
                     cursor.close();
                 }
             });
-            viewHolder.title.setText(getItem(position).toString());
+
+
+            int ID = myDB.returnIDFromHT(habit_name);
+
+            Log.d("I", "Title: " + habit_name + " ID: " + ID);
+
+            allCalendars.put(ID, viewHolder.calendar);
+
+            Log.d("I", "allCalendars size = " + allCalendars.size());
+
+            viewHolder.title.setText(habit_name);
             return convertView;
         }
     }
