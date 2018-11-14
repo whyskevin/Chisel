@@ -81,11 +81,6 @@ public class DescriptionActivity extends AppCompatActivity {
 
         }
         dialog = new Dialog(this);
-        Calendar calendar = Calendar.getInstance();
-        int today = calendar.get(Calendar.DAY_OF_WEEK);
-        materialCalendarView.state().edit()
-                .setFirstDayOfWeek(DayOfWeek.of(today))
-                .commit();
 
         materialCalendarView.setOnDateLongClickListener(new OnDateLongClickListener() {
             @Override

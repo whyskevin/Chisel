@@ -48,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
     ListView userList;
     ArrayList<String> listItem;
     ArrayAdapter adapter;
-    ArrayList<CalendarDay> completed = new ArrayList<>(), notCompleted = new ArrayList<>();
+    ArrayList<ArrayList<CalendarDay>> completedLists = new ArrayList<>(),
+                                      notCompletedLists = new ArrayList<>();
 
     DescriptionActivity sm;
 
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    CalendarInfo calendarInfo = new CalendarInfo((String) adapter.getItem(position), completed, notCompleted);
+                    CalendarInfo calendarInfo = new CalendarInfo((String) adapter.getItem(position), completedLists.get(position), notCompletedLists.get(position));
                     Intent appInfo = new Intent(MainActivity.this, DescriptionActivity.class);
                     appInfo.putExtra("calendarInfo", calendarInfo);
                     startActivity(appInfo);
@@ -143,7 +144,9 @@ public class MainActivity extends AppCompatActivity {
                         .setFirstDayOfWeek(DayOfWeek.of(today))
                         .commit();
 
-                completed.clear(); notCompleted.clear();
+                final ArrayList<CalendarDay> completed = new ArrayList<>(), notCompleted = new ArrayList<>();
+                completedLists.add(completed);
+                notCompletedLists.add(notCompleted);
                 try {
                     populateCalendar(getItem(position), viewHolder.calendar, completed, notCompleted);
                 }
