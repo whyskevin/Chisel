@@ -46,8 +46,11 @@ public class DescriptionActivity extends AppCompatActivity {
     DatabaseHelper myDB;
     TextView freq;
     TextView desc;
-    String name;
+    String habitName;
     Dialog dialog;
+    ArrayList<CalendarDay> completed;
+    ArrayList<CalendarDay> notCompleted;
+    MaterialCalendarView materialCalendarView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,55 +65,60 @@ public class DescriptionActivity extends AppCompatActivity {
         myDB = new DatabaseHelper(this);
         freq = findViewById(R.id.text_frequency);
         desc = findViewById(R.id.text_description);
+        materialCalendarView = findViewById(R.id.calendarView);
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
-            name = extras.getString("name");
-            setTitle(name);
-            showInfo(name);
+            CalendarInfo calendarInfo = getIntent().getParcelableExtra("calendarInfo");
+            habitName = calendarInfo.getHabitName();
+            setTitle(habitName);
+            showInfo(habitName);
+            completed = calendarInfo.getCompleted();
+            notCompleted = calendarInfo.getNotCompleted();
+            populateCalendar();
+            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+
         }
         dialog = new Dialog(this);
-
-        MaterialCalendarView materialCalendarView = findViewById(R.id.calendarView);
+        Calendar calendar = Calendar.getInstance();
+        int today = calendar.get(Calendar.DAY_OF_WEEK);
         materialCalendarView.state().edit()
+                .setFirstDayOfWeek(DayOfWeek.of(today))
                 .commit();
 
-
-
-        Collection<CalendarDay> completed = new ArrayList<>();
-        Collection<CalendarDay> notCompleted = new ArrayList<>();
         materialCalendarView.setOnDateLongClickListener(new OnDateLongClickListener() {
             @Override
             public void onDateLongClick(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay) {
-//                Toast.makeText(DescriptionActivity.this, "" + calendarDay, Toast.LENGTH_SHORT).show();
-//                if(completed.contains(calendarDay)) {
-//                    completed.remove(calendarDay);
-//                    notCompleted.add(calendarDay);
-//                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
-//                }
-//                else {
-//                    completed.add(calendarDay);
-//                    notCompleted.remove(calendarDay);
-//                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
-//                }
+                Toast.makeText(DescriptionActivity.this, "" + calendarDay, Toast.LENGTH_SHORT).show();
+                if(completed.contains(calendarDay)) {
+                    completed.remove(calendarDay);
+                    notCompleted.add(calendarDay);
+                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+                }
+                else {
+                    completed.add(calendarDay);
+                    notCompleted.remove(calendarDay);
+                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+                }
             }
         });
-//        materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
-//            @Override
-//            public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
-//                Toast.makeText(DescriptionActivity.this, "" + calendarDay, Toast.LENGTH_SHORT).show();
-//                if(completed.contains(calendarDay)) {
-//                    completed.remove(calendarDay);
-//                    notCompleted.add(calendarDay);
-//                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
-//                }
-//                else {
-//                    completed.add(calendarDay);
-//                    notCompleted.remove(calendarDay);
-//                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
-//                }
-//            }
-//        });
+        materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
+                Toast.makeText(DescriptionActivity.this, "" + calendarDay, Toast.LENGTH_SHORT).show();
+                if(completed.contains(calendarDay)) {
+                    completed.remove(calendarDay);
+                    notCompleted.add(calendarDay);
+                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+                }
+                else {
+                    completed.add(calendarDay);
+                    notCompleted.remove(calendarDay);
+                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+                }
+            }
+        });
     }
 
     @Override
@@ -141,7 +149,7 @@ public class DescriptionActivity extends AppCompatActivity {
         Intent editIntent = new Intent(this, EditHabitActivity.class);
         Bundle extra = new Bundle();
         //Passes the habit name into the Intent extra
-        extra.putString("habit_name",name);
+        extra.putString("habit_name",habitName);
         editIntent.putExtras(extra);
         myDB.close();
         //This starts the new edit activity
@@ -188,7 +196,7 @@ public class DescriptionActivity extends AppCompatActivity {
     }
 
     public void delete() {
-        int habitID = myDB.returnIDFromHT(name);
+        int habitID = myDB.returnIDFromHT(habitName);
 //        myDB.dropTable("Table_"+habitID);
 //        if(myDB.deleteFromHT(String.valueOf(habitID))) {
 //            Log.d("E", "was deleted");
