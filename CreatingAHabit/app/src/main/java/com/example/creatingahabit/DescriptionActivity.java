@@ -23,11 +23,13 @@ import android.widget.CalendarView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.charts.LineChart;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateLongClickListener;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+
 
 import org.threeten.bp.DayOfWeek;
 
@@ -51,6 +53,7 @@ public class DescriptionActivity extends AppCompatActivity {
     ArrayList<CalendarDay> completed;
     ArrayList<CalendarDay> notCompleted;
     MaterialCalendarView materialCalendarView;
+    LineChart lineChart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,7 @@ public class DescriptionActivity extends AppCompatActivity {
         freq = findViewById(R.id.text_frequency);
         desc = findViewById(R.id.text_description);
         materialCalendarView = findViewById(R.id.calendarView);
+        lineChart = findViewById(R.id.linechart);
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
