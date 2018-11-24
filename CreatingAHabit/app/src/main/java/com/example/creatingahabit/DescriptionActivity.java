@@ -24,6 +24,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.charts.ScatterChart;
+
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.data.ScatterData;
+import com.github.mikephil.charting.data.ScatterDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.IScatterDataSet;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
@@ -53,7 +62,7 @@ public class DescriptionActivity extends AppCompatActivity {
     ArrayList<CalendarDay> completed;
     ArrayList<CalendarDay> notCompleted;
     MaterialCalendarView materialCalendarView;
-    LineChart lineChart;
+    ScatterChart scatterChart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +78,7 @@ public class DescriptionActivity extends AppCompatActivity {
         freq = findViewById(R.id.text_frequency);
         desc = findViewById(R.id.text_description);
         materialCalendarView = findViewById(R.id.calendarView);
-        lineChart = findViewById(R.id.linechart);
+        scatterChart = findViewById(R.id.scatterchart);
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
@@ -118,6 +127,9 @@ public class DescriptionActivity extends AppCompatActivity {
                 }
             }
         });
+
+//        testMPAndroidChart();
+        chart();
     }
 
     @Override
@@ -208,4 +220,52 @@ public class DescriptionActivity extends AppCompatActivity {
             Toast.makeText(DescriptionActivity.this, "Habit deleted", Toast.LENGTH_LONG).show();
         }
     }
+
+    //Plots (10,10) on the Scatter plot in the Description Activity
+    public void testMPAndroidChart(){
+        //Testing Scatter Data: hard code point (10,10)
+        ArrayList<Entry> list1 = new ArrayList<Entry>();
+        //Populate the list with new "Entries". These will be data points of the
+        list1.add(new Entry(10,10));
+        ScatterDataSet dataSet = new ScatterDataSet(list1, "Kevin's Data");
+        dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+        ArrayList<IScatterDataSet> dataSets = new ArrayList<IScatterDataSet>();
+        dataSets.add(dataSet);
+        ScatterData data = new ScatterData(dataSets);
+        scatterChart.setData(data);
+        scatterChart.invalidate();
+    }
+
+    public void chart(){
+        int i = 0;
+        ArrayList<Entry> completedDays = new ArrayList<Entry>();
+        //Populate the list with new "Entries". These will be data points of the
+//        int habitID = myDB.returnIDFromHT(habitName);
+        Cursor cursor = myDB.getAllDataHR(habitName);
+        if(cursor.getCount() == 0) {
+            Toast.makeText(this, "No data to show", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            while(cursor.moveToNext()) {
+                int complete = Integer.valueOf(cursor.getString(2));
+//                int date = Integer.valueOf(cursor.getString(1));
+                if(complete > 0) {
+                    completedDays.add(new Entry(i ,1));
+                }else{
+                    completedDays.add(new Entry(i ,0));
+                }
+                i++;
+            }
+        }
+        ScatterDataSet dataSet = new ScatterDataSet(completedDays, "Kevin's Data");
+        dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+        ArrayList<IScatterDataSet> dataSets = new ArrayList<IScatterDataSet>();
+        dataSets.add(dataSet);
+        ScatterData data = new ScatterData(dataSets);
+        scatterChart.setData(data);
+        scatterChart.invalidate();
+
+    }
+
+
 }
