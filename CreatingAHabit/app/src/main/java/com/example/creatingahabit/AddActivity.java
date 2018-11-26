@@ -1,6 +1,7 @@
 package com.example.creatingahabit;
 
 import android.app.AlarmManager;
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -19,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -41,6 +43,7 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
     String spinnerSelected;
     Switch reminder_switch;
     Calendar setTimeReminder;
+    Dialog dialog;
 
     NotificationCompat.Builder notification;
     private static final int uniqueID = 45612;
@@ -51,6 +54,7 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
         setContentView(R.layout.activity_add);
 
         myDB = new DatabaseHelper(this);
+        dialog = new Dialog(this);
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(myToolbar);
@@ -63,7 +67,7 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
         habitFrequency = (EditText) findViewById(R.id.frequency);
         createHabit = (MenuItem) findViewById(R.id.save);
         frequencySpinner = (Spinner)findViewById(R.id.frequency_spinner);
-        spinnerCreation();
+        spinnerCreation(frequencySpinner);
 
         notification = new NotificationCompat.Builder(this, "MyChannelId_01");
         notification.setAutoCancel(true);
@@ -133,12 +137,12 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
         return super.onCreateOptionsMenu(menu);
     }
 
-    public void spinnerCreation(){
+    public void spinnerCreation(Spinner spinner){
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
         R.array.frequency_spinner_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-        frequencySpinner.setAdapter(adapter);
-        frequencySpinner.setOnItemSelectedListener(this);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
     }
 
     @Override
@@ -150,23 +154,10 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
                         habitDescription.getText().toString(),
                         habitFrequency.getText().toString(), spinnerSelected);
                 if (isInserted) {
-                    Toast.makeText(AddActivity.this, "Data Inserted", Toast.LENGTH_LONG).show();
+                    Toast.makeText(AddActivity.this, myDB.returnIDFromHT(habitNameTrimmed) + ": Data Inserted", Toast.LENGTH_LONG).show();
 
                     //send data to notification receiver
-
-                    //for testing purposes
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.add(Calendar.SECOND, 5);
-
-                    //set reminder here with alarm service
-                    AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-                    Intent intent = new Intent(getApplicationContext(), NotificationReceiver.class);
-                    intent.putExtra("name", habitName.getText().toString());
-                    intent.putExtra("description", habitDescription.getText().toString());
-                    intent.putExtra("frequency", habitFrequency.getText().toString());
-                    intent.putExtra("timePeriod", spinnerSelected.toString());
-                    PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
+                    makeAlarm();
 
                     Intent create = new Intent(this, MainActivity.class);
                     startActivity(create);
@@ -183,11 +174,30 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
         spinnerSelected = adapterView.getItemAtPosition(position).toString();
-        Toast.makeText(adapterView.getContext(), "Selected spinner frequency: "+ spinnerSelected, Toast.LENGTH_LONG).show();
+        //Toast.makeText(adapterView.getContext(), "Selected spinner frequency: "+ spinnerSelected, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
+    }
+
+    public void makeAlarm() {
+        //for testing purposes
+        Calendar calendar = Calendar.getInstance();
+//                    calendar.add(Calendar.SECOND, 5);
+
+        //set reminder here with alarm service
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent intent = new Intent(getApplicationContext(), NotificationReceiver.class);
+        intent.putExtra("name", habitName.getText().toString());
+        intent.putExtra("description", habitDescription.getText().toString());
+        intent.putExtra("frequency", habitFrequency.getText().toString());
+        intent.putExtra("timePeriod", spinnerSelected.toString());
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if(setTimeReminder.before(calendar)) {
+            setTimeReminder.add(Calendar.DATE, 1);
+        }
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, setTimeReminder.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
     }
 
     public void setTime(View view) {
@@ -204,4 +214,42 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
         timePickerDialog.show();
     }
 
+    public void clickReminder(View view) {
+        TextView txtclose;
+        Button yes, no, buttonDaysOfWeek;
+        dialog.setContentView(R.layout.reminder_popup_window);
+        buttonDaysOfWeek = findViewById(R.id.buttonDaysOfWeek);
+        txtclose = dialog.findViewById(R.id.close_window);
+        //yes = dialog.findViewById(R.id.btn_yes);
+        //no = dialog.findViewById(R.id.btn_no);
+        //use setOnItemClickListener
+        boolean delete = false;
+        //close the window using the x button on top right
+        txtclose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        //yes button
+//        yes.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialog.dismiss();
+//            }
+//        });
+//        //no button
+//        no.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialog.dismiss();
+//            }
+//        });
+        dialog.show();
+    }
+
+    public void clickDaysOfWeek(View view) {
+        dialog.setContentView(R.layout.days_of_week_list);
+        
+    }
 }

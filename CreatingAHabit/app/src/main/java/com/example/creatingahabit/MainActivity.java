@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 viewHolder.calendar.state().edit()
                         .setFirstDayOfWeek(DayOfWeek.of(today))
                         .commit();
+                viewHolder.calendar.setTopbarVisible(false);
 
                 final ArrayList<CalendarDay> completed = new ArrayList<>(), notCompleted = new ArrayList<>();
                 completedLists.add(completed);
@@ -186,12 +187,23 @@ public class MainActivity extends AppCompatActivity {
         if(completed.contains(calendarDay)) {
             completed.remove((calendarDay));
             notCompleted.add(calendarDay);
-            myDB.updateCompletion(habitName, calendarDay.getDate().toString(), false);        }
+            myDB.updateCompletion(habitName, calendarDay.getDate().toString(), false);
+        }
         else {
+            boolean notCompleteHas = false;
+            if(notCompleted.contains(calendarDay)) {
+                notCompleteHas = true;
+            }
             notCompleted.remove(calendarDay);
             completed.add((calendarDay));
             System.out.println("ASDASDASD " + calendarDay.getDate().toString());
-            myDB.insertDataToHR("Table_" + myDB.returnIDFromHT(habitName), calendarDay.getDate().toString(), "1", "Complete");
+            if(!notCompleteHas) {
+                myDB.insertDataToHR("Table_" + myDB.returnIDFromHT(habitName), calendarDay.getDate().toString(), "1", "Complete");
+
+            }
+            else {
+                myDB.updateCompletion(habitName, calendarDay.getDate().toString(), true);
+            }
         }
         materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
         materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
@@ -203,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = myDB.getAllDataHR(habitName);
         int habitID = myDB.returnIDFromHT(habitName);
         if(cursor.getCount() == 0) {
-            Toast.makeText(this, "No data in Table_" + habitID, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "No data in Table_" + habitID, Toast.LENGTH_SHORT).show();
         }
         else {
             while(cursor.moveToNext()) {

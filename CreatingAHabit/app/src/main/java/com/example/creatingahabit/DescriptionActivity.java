@@ -89,31 +89,43 @@ public class DescriptionActivity extends AppCompatActivity {
                 if(completed.contains(calendarDay)) {
                     completed.remove(calendarDay);
                     notCompleted.add(calendarDay);
+                    myDB.updateCompletion(habitName, calendarDay.getDate().toString(), false);
                     materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
                 }
                 else {
-                    completed.add(calendarDay);
+                    boolean notCompleteHas = false;
+                    if(notCompleted.contains(calendarDay)) {
+                        notCompleteHas = true;
+                    }
                     notCompleted.remove(calendarDay);
+                    completed.add((calendarDay));
+                    if(!notCompleteHas) {
+                        myDB.insertDataToHR("Table_" + myDB.returnIDFromHT(habitName), calendarDay.getDate().toString(), "1", "Complete");
+
+                    }
+                    else {
+                        myDB.updateCompletion(habitName, calendarDay.getDate().toString(), true);
+                    }
                     materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
                 }
             }
         });
-        materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
-            @Override
-            public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
-                Toast.makeText(DescriptionActivity.this, "" + calendarDay, Toast.LENGTH_SHORT).show();
-                if(completed.contains(calendarDay)) {
-                    completed.remove(calendarDay);
-                    notCompleted.add(calendarDay);
-                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
-                }
-                else {
-                    completed.add(calendarDay);
-                    notCompleted.remove(calendarDay);
-                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
-                }
-            }
-        });
+//        materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
+//            @Override
+//            public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
+//                Toast.makeText(DescriptionActivity.this, "" + calendarDay, Toast.LENGTH_SHORT).show();
+//                if(completed.contains(calendarDay)) {
+//                    completed.remove(calendarDay);
+//                    notCompleted.add(calendarDay);
+//                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+//                }
+//                else {
+//                    completed.add(calendarDay);
+//                    notCompleted.remove(calendarDay);
+//                    materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+//                }
+//            }
+//        });
     }
 
     @Override

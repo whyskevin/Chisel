@@ -36,10 +36,10 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public static final String NOTE = "NOTE";
 
     //Create Table Statements
-    public static final String CREATE_TABLE_HABIT_TABLE = "CREATE TABLE " + HT_NAME + " ( " + HABIT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + HABIT_NAME + " TEXT UNIQUE, "
+    public static final String CREATE_TABLE_HABIT_TABLE = "CREATE TABLE " + HT_NAME + " ( " + HABIT_ID + " INTEGER PRIMARY KEY, " + HABIT_NAME + " TEXT UNIQUE, "
                                                                                             + HABIT_DESCRIPTION + " TEXT, " + HABIT_FREQUENCY + " INTEGER, " + HABIT_TIME_PERIOD + " TEXT )";
 
-    public static String CREATE_TABLE_HABIT_RECORD = "CREATE TABLE " + HR_NAME + " ( " + HR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + DATE + " TEXT, " + COMPLETE + " INTEGER, " + NOTE + " TEXT )";
+    public static String CREATE_TABLE_HABIT_RECORD = "CREATE TABLE " + HR_NAME + " ( " + HR_ID + " INTEGER PRIMARY KEY, " + DATE + " TEXT, " + COMPLETE + " INTEGER, " + NOTE + " TEXT )";
 
 
     //Constructor
