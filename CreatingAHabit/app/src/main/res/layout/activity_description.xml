@@ -27,6 +27,13 @@
             app:mcv_selectionMode="none"
             app:mcv_selectionColor="@color/colorPrimary"
             app:mcv_showOtherDates="all" />
+        
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            />
+
 
         <TextView
             android:id="@+id/textView3"
