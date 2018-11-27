@@ -35,6 +35,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+
+
 import static android.Manifest.permission_group.CALENDAR;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
@@ -48,6 +55,8 @@ public class DescriptionActivity extends AppCompatActivity {
     TextView desc;
     String name;
     Dialog dialog;
+    PieChart graph;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +71,12 @@ public class DescriptionActivity extends AppCompatActivity {
         myDB = new DatabaseHelper(this);
         freq = findViewById(R.id.text_frequency);
         desc = findViewById(R.id.text_description);
+        
+        graph =(PieChart) findViewById(R.id.chart);
+        graph.getDescription().setEnabled(false);
+        graph.getLegend().setEnabled(false);
+        graph.setUsePercentValues(true);
+
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
@@ -93,6 +108,7 @@ public class DescriptionActivity extends AppCompatActivity {
                     notCompleted.remove(calendarDay);
                     materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
                 }
+                setGraphData();
             }
         });
 //        materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
@@ -111,8 +127,39 @@ public class DescriptionActivity extends AppCompatActivity {
 //                }
 //            }
 //        });
+          setGraphData();
     }
 
+        public void setGraphData(){
+        ArrayList<PieEntry> entries1 = new ArrayList<>();
+  if(notCompleted.size() == 0 && completed.size() == 0){
+            graph.setVisibility(View.GONE);
+        }
+        else
+            graph.setVisibility(View.VISIBLE);
+
+        entries1.add(new PieEntry((float)completed.size(), R.color.colorPrimaryDark));
+        entries1.add(new PieEntry((float)notCompleted.size(),  R.color.colorAccent));
+
+
+        PieDataSet dataSet1 = new PieDataSet(entries1, "result");
+
+        final int[] myColors = {
+                Color.rgb(152,234,105),
+                Color.rgb(239,100,97),
+        };
+        ArrayList<Integer> colors = new ArrayList<>();
+        for(int c: myColors) colors.add(c);
+        dataSet1.setColors(colors);
+
+        PieData data = new PieData(dataSet1);
+        data.setValueFormatter(new PercentFormatter());
+        data.setValueTextSize(12f);
+        data.setValueTextColor(Color.WHITE);
+        graph.setData(data);
+        graph.invalidate();
+    }
+    
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent add = new Intent(this, MainActivity.class);
