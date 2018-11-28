@@ -46,8 +46,11 @@ public class DescriptionActivity extends AppCompatActivity {
     DatabaseHelper myDB;
     TextView freq;
     TextView desc;
-    String name;
+    String habitName;
     Dialog dialog;
+    ArrayList<CalendarDay> completed;
+    ArrayList<CalendarDay> notCompleted;
+    MaterialCalendarView materialCalendarView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,23 +65,22 @@ public class DescriptionActivity extends AppCompatActivity {
         myDB = new DatabaseHelper(this);
         freq = findViewById(R.id.text_frequency);
         desc = findViewById(R.id.text_description);
+        materialCalendarView = findViewById(R.id.calendarView);
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
-            name = extras.getString("name");
-            setTitle(name);
-            showInfo(name);
+            CalendarInfo calendarInfo = getIntent().getParcelableExtra("calendarInfo");
+            habitName = calendarInfo.getHabitName();
+            setTitle(habitName);
+            showInfo(habitName);
+            completed = calendarInfo.getCompleted();
+            notCompleted = calendarInfo.getNotCompleted();
+            populateCalendar();
+            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+
         }
         dialog = new Dialog(this);
-
-        MaterialCalendarView materialCalendarView = findViewById(R.id.calendarView);
-        materialCalendarView.state().edit()
-                .commit();
-
-
-
-        Collection<CalendarDay> completed = new ArrayList<>();
-        Collection<CalendarDay> notCompleted = new ArrayList<>();
         materialCalendarView.setOnDateLongClickListener(new OnDateLongClickListener() {
             @Override
             public void onDateLongClick(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay) {
@@ -86,11 +88,23 @@ public class DescriptionActivity extends AppCompatActivity {
                 if(completed.contains(calendarDay)) {
                     completed.remove(calendarDay);
                     notCompleted.add(calendarDay);
+                    myDB.updateCompletion(habitName, calendarDay.getDate().toString(), false);
                     materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
                 }
                 else {
-                    completed.add(calendarDay);
+                    boolean notCompleteHas = false;
+                    if(notCompleted.contains(calendarDay)) {
+                        notCompleteHas = true;
+                    }
                     notCompleted.remove(calendarDay);
+                    completed.add((calendarDay));
+                    if(!notCompleteHas) {
+                        myDB.insertDataToHR("Table_" + myDB.returnIDFromHT(habitName), calendarDay.getDate().toString(), "1", "Complete");
+
+                    }
+                    else {
+                        myDB.updateCompletion(habitName, calendarDay.getDate().toString(), true);
+                    }
                     materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
                 }
             }
@@ -122,9 +136,9 @@ public class DescriptionActivity extends AppCompatActivity {
     }
 
     public void showInfo(String name) {
-        int ID = myDB.returnID(name);
+        int ID = myDB.returnIDFromHT(name);
         Log.d("E", "ID is:" + ID);
-        Cursor cursor = myDB.getItem(String.valueOf(ID));
+        Cursor cursor = myDB.getRecordFromHT(String.valueOf(ID));
         if(cursor.getCount() == 0) {
             Toast.makeText(this, "No data to show", Toast.LENGTH_SHORT).show();
         }
@@ -141,11 +155,16 @@ public class DescriptionActivity extends AppCompatActivity {
         Intent editIntent = new Intent(this, EditHabitActivity.class);
         Bundle extra = new Bundle();
         //Passes the habit name into the Intent extra
-        extra.putString("habit_name",name);
+        extra.putString("habit_name",habitName);
         editIntent.putExtras(extra);
         myDB.close();
         //This starts the new edit activity
         startActivity(editIntent);
+    }
+
+    public void populateCalendar(){
+//        Cursor cs = myDB.getReadableDatabase();
+
     }
 
     public void clickDelete(View view) {
@@ -168,6 +187,7 @@ public class DescriptionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
+//                myDB.dropTable("Table_20");
                 delete();
             }
         });
@@ -180,8 +200,15 @@ public class DescriptionActivity extends AppCompatActivity {
         });
         dialog.show();
     }
+
     public void delete() {
-        if(myDB.deleteData(String.valueOf(myDB.returnID(name)))) {
+        int habitID = myDB.returnIDFromHT(habitName);
+//        myDB.dropTable("Table_"+habitID);
+//        if(myDB.deleteFromHT(String.valueOf(habitID))) {
+//            Log.d("E", "was deleted");
+//        }else
+//            Log.d("E", "wasn't deleted");
+        if(myDB.deleteFromHT(String.valueOf(habitID))) {
             Intent intent = new Intent(this, MainActivity.class);
             myDB.close();
             startActivity(intent);

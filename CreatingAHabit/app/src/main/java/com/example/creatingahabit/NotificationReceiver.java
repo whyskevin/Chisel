@@ -21,6 +21,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         String habitName = "", habitDescription = "", habitFrequency = "", habitTimePeriod = "";
 
+        int habitId = intent.getExtras().getInt("id");
         habitName = intent.getExtras().getString("name");
         habitDescription = intent.getExtras().getString("description");
         habitFrequency = intent.getExtras().getString("frequency");
@@ -28,17 +29,15 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         Intent repeatingIntent = new Intent(context, MainActivity.class);
         repeatingIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 100, repeatingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, habitId, repeatingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        int NOTIFICATION_ID = 234;
+        int NOTIFICATION_ID = habitId;
         String CHANNEL_ID = "my_channel_01";
         CharSequence name = "my_channel";
         String Description = "This is my channel";
         int importance = NotificationManager.IMPORTANCE_HIGH;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-
-
             NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
             mChannel.setDescription(Description);
             mChannel.enableLights(true);

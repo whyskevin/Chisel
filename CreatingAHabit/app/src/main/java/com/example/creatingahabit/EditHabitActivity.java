@@ -60,7 +60,7 @@ public class EditHabitActivity extends AppCompatActivity implements AdapterView.
         formerHabitName = message; //consolidate later@@@@@@@@@@@@@@@@@@@@@@@@@
         setTitle(message);
 //        formerHabitName = habitName.getText().toString();
-        habitID = myDB.returnID(message);
+        habitID = myDB.returnIDFromHT(message);
         populateEditText(message);
     }
 
@@ -75,7 +75,7 @@ public class EditHabitActivity extends AppCompatActivity implements AdapterView.
     public void populateEditText(String name){
         Cursor cursor = null;
         try{
-            cursor = myDB.getItem(String.valueOf(habitID));
+            cursor = myDB.getRecordFromHT(String.valueOf(habitID));
             if(cursor.getCount() == 0) {
                 Toast.makeText(this, "No data to show", Toast.LENGTH_SHORT).show();
                 return;
@@ -111,7 +111,7 @@ public class EditHabitActivity extends AppCompatActivity implements AdapterView.
         String name = habitName.getText().toString().trim();
         Intent create = new Intent(this, DescriptionActivity.class);
         if(name.length() != 0) {
-            myDB.updateData(habitID, name, habitDescription.getText().toString(),
+            myDB.updateHT(habitID, name, habitDescription.getText().toString(),
                             habitFrequency.getText().toString(), spinnerSelected);
             create.putExtra("name", name);
         }

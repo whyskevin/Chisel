@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,6 +18,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import android.content.Context;
@@ -28,11 +32,13 @@ import android.widget.TextView;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import org.threeten.bp.DayOfWeek;
 import org.threeten.bp.LocalDate;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -42,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     ListView userList;
     ArrayList<String> listItem;
     ArrayAdapter adapter;
+    ArrayList<ArrayList<CalendarDay>> completedLists = new ArrayList<>(),
+                                      notCompletedLists = new ArrayList<>();
 
     DescriptionActivity sm;
 
@@ -56,8 +64,14 @@ public class MainActivity extends AppCompatActivity {
         listItem = new ArrayList<>();
         userList = findViewById(R.id.user_list);
         viewList();
-        adapter = new myListAdapter( this, R.layout.list_item, listItem);
-        userList.setAdapter(adapter);
+
+//        Calendar calendar = Calendar.getInstance();
+//        int day = calendar.get(Calendar.DAY_OF_WEEK);
+//        MaterialCalendarView materialCalendarView = findViewById(R.id.calendarView);
+//        materialCalendarView.setTopbarVisible(false);
+//        materialCalendarView.state().edit()
+//                .setFirstDayOfWeek(DayOfWeek.of(day))
+//                .commit();
 
         Calendar calendar = Calendar.getInstance();
         int day = calendar.get(Calendar.DAY_OF_WEEK);
@@ -89,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void viewList() {
-        Cursor cursor = myDB.viewData();
+        Cursor cursor = myDB.readAllDataHT();
         if(cursor.getCount() == 0) {
             Toast.makeText(this, "No data to show", Toast.LENGTH_SHORT).show();
         }
@@ -97,14 +111,15 @@ public class MainActivity extends AppCompatActivity {
             while(cursor.moveToNext()) {
                 listItem.add(cursor.getString(1));  //col 1 is name, col 0 is id
             }
-            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listItem);
+            adapter = new myListAdapter(this, R.layout.list_item_mcv, listItem);
             userList.setAdapter(adapter);
             //making view list buttons to take to different page
             userList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    CalendarInfo calendarInfo = new CalendarInfo((String) adapter.getItem(position), completedLists.get(position), notCompletedLists.get(position));
                     Intent appInfo = new Intent(MainActivity.this, DescriptionActivity.class);
-                    appInfo.putExtra("name", (String) adapter.getItem(position));
+                    appInfo.putExtra("calendarInfo", calendarInfo);
                     startActivity(appInfo);
                 }
             });
@@ -113,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class myListAdapter extends ArrayAdapter<String> {
         private int layout;
+
         public myListAdapter(@NonNull Context context, int resource, @NonNull List<String> objects) {
             super(context, resource, objects);
             layout = resource;
@@ -120,187 +136,49 @@ public class MainActivity extends AppCompatActivity {
 
         @NonNull
         @Override
-        public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent)
-        {
+        public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             ViewHolder mainViewHolder = null;
-            if (convertView == null){
+            if (convertView == null) {
 
                 LayoutInflater inflater = LayoutInflater.from(getContext());
                 convertView = inflater.inflate(layout, parent, false);
                 final ViewHolder viewHolder = new ViewHolder();
-                viewHolder.title = (TextView) convertView.findViewById(R.id.textView);
+                viewHolder.title = (TextView) convertView.findViewById(R.id.list_item_habit_name);
+                viewHolder.calendar = convertView.findViewById(R.id.calendarView);
+                viewHolder.title.setText(getItem(position));
+                Calendar calendar = Calendar.getInstance();
+                int today = calendar.get(Calendar.DAY_OF_WEEK);
+                viewHolder.calendar.state().edit()
+                        .setFirstDayOfWeek(DayOfWeek.of(today))
+                        .commit();
+                viewHolder.calendar.setTopbarVisible(false);
 
-                viewHolder.title.setText(getItem(position).toString());
-                viewHolder.buttonMon = (Button) convertView.findViewById(R.id.button);
-                viewHolder.buttonMon.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
-                    @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonMon.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
-                        }
-                        else if (i == 1){
-                            viewHolder.buttonMon.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonMon.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonMon.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
-                viewHolder.buttonTues = (Button) convertView.findViewById(R.id.button1);
-                viewHolder.buttonTues.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
-                    @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonTues.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
-                        }
-                        else if (i == 1){
-                            viewHolder.buttonTues.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonTues.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonTues.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
+                final ArrayList<CalendarDay> completed = new ArrayList<>(), notCompleted = new ArrayList<>();
+                completedLists.add(completed);
+                notCompletedLists.add(notCompleted);
+                try {
+                    populateCalendar(getItem(position), viewHolder.calendar, completed, notCompleted);
+                }
+                catch (ParseException e) {
 
-                viewHolder.buttonWed = (Button) convertView.findViewById(R.id.button2);
-                viewHolder.buttonWed.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
+                }
+                viewHolder.calendar.setOnDateChangedListener(new OnDateSelectedListener() {
                     @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonWed.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
+                    public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
+                        try {
+                            populateCalendar(getItem(position), viewHolder.calendar, completed, notCompleted, calendarDay);
                         }
-                        else if (i == 1){
-                            viewHolder.buttonWed.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonWed.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonWed.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
-                viewHolder.buttonThur = (Button) convertView.findViewById(R.id.button3);
-                viewHolder.buttonThur.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
-                    @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonThur.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
-                        }
-                        else if (i == 1){
-                            viewHolder.buttonThur.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonThur.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonThur.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
-                viewHolder.buttonFri = (Button) convertView.findViewById(R.id.button4);
-                viewHolder.buttonFri.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
-                    @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonFri.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
-                        }
-                        else if (i == 1){
-                            viewHolder.buttonFri.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonFri.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonFri.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
-                viewHolder.buttonSat = (Button) convertView.findViewById(R.id.button5);
-                viewHolder.buttonSat.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
-                    @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonSat.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
-                        }
-                        else if (i == 1){
-                            viewHolder.buttonSat.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonSat.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonSat.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
-                viewHolder.buttonSun = (Button) convertView.findViewById(R.id.button6);
-                viewHolder.buttonSun.setOnClickListener(new View.OnClickListener() {
-                    int i=1;
-                    @Override
-                    public void onClick(View v) {
-                        if (i == 0 ) {
-                            viewHolder.buttonSun.setBackgroundResource(R.drawable.circle_shape);
-                            i++;
-                        }
-                        else if (i == 1){
-                            viewHolder.buttonSun.setBackgroundResource(R.drawable.circle_shape_green);
-                            i++;
-                        }
-                        else if(i ==2){
-                            viewHolder.buttonSun.setBackgroundResource(R.drawable.circle_shape_red);
-                            i++;
-                        }
-                        else if( i ==3){
-                            viewHolder.buttonSun.setBackgroundResource(R.drawable.circle_shape_white);
-                            i = 0;
-                        }
-                    }
-                });
+                        catch (ParseException e) {
 
-
+                        }
+                    }
+                });
+                //
                 convertView.setTag(viewHolder);
-            }
-            else{
+            } else {
 
                 mainViewHolder = (ViewHolder) convertView.getTag();
-                mainViewHolder.title.setText(getItem(position).toString());
+                mainViewHolder.title.setText(getItem(position));
             }
             return convertView;
         }
@@ -309,13 +187,72 @@ public class MainActivity extends AppCompatActivity {
     }
     public class ViewHolder {
         TextView title;
-        Button buttonMon;
-        Button buttonTues;
-        Button buttonWed;
-        Button buttonThur;
-        Button buttonFri;
-        Button buttonSat;
-        Button buttonSun;
+        MaterialCalendarView calendar;
+    }
+
+    public void populateCalendar(String habitName, MaterialCalendarView materialCalendarView,
+                                 ArrayList<CalendarDay> completed, ArrayList<CalendarDay> notCompleted, CalendarDay calendarDay) throws ParseException {
+        if(completed.contains(calendarDay)) {
+            completed.remove((calendarDay));
+            notCompleted.add(calendarDay);
+            myDB.updateCompletion(habitName, calendarDay.getDate().toString(), false);
+        }
+        else {
+            boolean notCompleteHas = false;
+            if(notCompleted.contains(calendarDay)) {
+                notCompleteHas = true;
+            }
+            notCompleted.remove(calendarDay);
+            completed.add((calendarDay));
+            System.out.println("ASDASDASD " + calendarDay.getDate().toString());
+            if(!notCompleteHas) {
+                myDB.insertDataToHR("Table_" + myDB.returnIDFromHT(habitName), calendarDay.getDate().toString(), "1", "Complete");
+
+            }
+            else {
+                myDB.updateCompletion(habitName, calendarDay.getDate().toString(), true);
+            }
+        }
+        materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+        materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    public void populateCalendar(String habitName, MaterialCalendarView materialCalendarView,
+                                 ArrayList<CalendarDay> completed, ArrayList<CalendarDay> notCompleted) throws ParseException {
+        Cursor cursor = myDB.getAllDataHR(habitName);
+        int habitID = myDB.returnIDFromHT(habitName);
+        if(cursor.getCount() == 0) {
+            //Toast.makeText(this, "No data in Table_" + habitID, Toast.LENGTH_SHORT).show();
+        }
+        else {
+            while(cursor.moveToNext()) {
+                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(cursor.getString(1));
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(date);
+                int year = cal.get(Calendar.YEAR);
+                int month = cal.get(Calendar.MONTH) + 1;
+                int day = cal.get(Calendar.DAY_OF_MONTH);
+                CalendarDay selectedDay = CalendarDay.from(year,month,day);
+                System.out.println(habitName + ": + " + month + "/" + day + "/" + year);
+
+                //Incomplete habit
+                if(Integer.valueOf(cursor.getString(2)) == 0){
+                    Log.d("I", "Extracted habit " + habitName + " for " + selectedDay.toString() + " is complete") ;
+                    if(!notCompleted.contains(selectedDay) && !completed.contains(selectedDay)) {
+                        notCompleted.add(selectedDay);
+                    }
+                }else if (Integer.valueOf(cursor.getString(2)) > 0){ //The habit has been complete that day
+                    Log.d("I", "Extracted habit " + habitName + " for " + selectedDay.toString() + " is complete") ;
+                    if(!completed.contains(selectedDay) && !notCompleted.contains(selectedDay)) {
+                        completed.add(selectedDay);
+                    }
+                }
+            }
+            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+            cursor.close();
+        }
     }
 
     public void viewAll() {
@@ -323,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                Cursor res = myDB.getAllData();
+                Cursor res = myDB.readAllDataHT();
                 if(res.getCount() == 0){ //A table with empty rows will not have any data
                     showMessage("Error", "Nothing found");
                 }
