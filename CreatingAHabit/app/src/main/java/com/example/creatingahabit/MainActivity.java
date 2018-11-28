@@ -73,14 +73,6 @@ public class MainActivity extends AppCompatActivity {
 //                .setFirstDayOfWeek(DayOfWeek.of(day))
 //                .commit();
 
-        Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DAY_OF_WEEK);
-        MaterialCalendarView materialCalendarView = findViewById(R.id.calendarView);
-        materialCalendarView.setTopbarVisible(false);
-        materialCalendarView.state().edit()
-                .setFirstDayOfWeek(DayOfWeek.of(day))
-                .commit();
-
         //button = (Button) findViewById(R.id.displayHabits);
 
         //viewAll();
