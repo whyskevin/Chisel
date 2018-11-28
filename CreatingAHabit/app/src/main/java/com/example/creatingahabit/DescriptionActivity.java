@@ -117,6 +117,7 @@ public class DescriptionActivity extends AppCompatActivity {
                     notCompleted.remove(calendarDay);
                     materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
                 }
+//                chart();
             }
         });
         materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
@@ -133,26 +134,9 @@ public class DescriptionActivity extends AppCompatActivity {
                     notCompleted.remove(calendarDay);
                     materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
                 }
+                chart();
             }
         });
-
-        Cursor cursor = myDB.getAllDataHRSortedByDate(habitName);
-        if(cursor.getCount() == 0) {
-            Toast.makeText(this, "SORTED DATE EMPTY", Toast.LENGTH_SHORT).show();
-        }
-        else {
-            while(cursor.moveToNext()) {
-                int complete = Integer.valueOf(cursor.getString(2));
-                String s = cursor.getString(1);
-                Log.d("I", "OHCOMEON: " + s);
-//                if(complete > 0) {
-//                    completedDays.add(new Entry(i ,1));
-//                }else{
-//                    completedDays.add(new Entry(i ,0));
-//                }
-//                i++;
-            }
-        }
 
 //        testMPAndroidChart();
         chart();
@@ -252,8 +236,8 @@ public class DescriptionActivity extends AppCompatActivity {
 
         ArrayList<Entry> entries = new ArrayList ();
                 entries.add(new Entry(0f, 0));
-                entries.add(new Entry(1f, 1));
-                entries.add(new Entry(2f, 2));
+                entries.add(new Entry(1f, 5));
+                entries.add(new Entry(2f, 10));
 //                entries.add(new Entry(12f, 3));
 //                entries.add(new Entry(18f, 4));
 //                entries.add(new Entry(9f, 5));
@@ -273,16 +257,18 @@ public class DescriptionActivity extends AppCompatActivity {
 
 
         // the labels that should be drawn on the XAxis
-        final String[] quarters = new String[] { "2018-11-26", "2018-11-28", "2018-11-27"};
+        String[] quarters = new String[] { "2018-11-26", "2018-11-28", "2018-11-27"};
 
-        IAxisValueFormatter formatter = new IAxisValueFormatter() {
+//        IAxisValueFormatter formatter = new IAxisValueFormatter() {
+//
+//            @Override
+//            public String getFormattedValue(float value, AxisBase axis) {
+//                return quarters[(int) value];
+//            }
+//        };
 
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return quarters[(int) value];
-            }
-        };
 
+        IAxisValueFormatter formatter = new MyXAxisValueFormatter(quarters);
         XAxis xAxis = scatterChart.getXAxis();
         xAxis.setGranularity(1f); // minimum axis-step (interval) is 1
         xAxis.setValueFormatter(formatter);
@@ -328,7 +314,7 @@ public class DescriptionActivity extends AppCompatActivity {
         ArrayList<Entry> completedDays = new ArrayList<Entry>();
         ArrayList<String> dates = new ArrayList<>();
         //Populate the list with new "Entries". These will be data points of the
-//        int habitID = myDB.returnIDFromHT(habitName);
+        //int habitID = myDB.returnIDFromHT(habitName);
         Cursor cursor = myDB.getAllDataHRSortedByDate(habitName);
         if(cursor.getCount() == 0) {
             Toast.makeText(this, "No data to show", Toast.LENGTH_SHORT).show();
@@ -337,7 +323,7 @@ public class DescriptionActivity extends AppCompatActivity {
             while(cursor.moveToNext()) {
                 int complete = Integer.valueOf(cursor.getString(2));
                 String date = cursor.getString(1);
-                dates.add(date);
+                dates.add(customDateFormat(date));
                 if(complete > 0) {
                     completedDays.add(new Entry(i ,1));
                 }else{
@@ -354,8 +340,9 @@ public class DescriptionActivity extends AppCompatActivity {
 
         String[] values = new String[numberOfDates];
 
-        for(int index = 0; i < numberOfDates-1; index++){
+        for(int index = 0; index < numberOfDates; index++){
             values[index] = dates.get(index);
+            Log.d("I", " ARRAY[" + index + "] = " + values[index]);
         }
 
         Log.d("I", "Size of dates arraylist: " + dates.size());
@@ -379,12 +366,11 @@ public class DescriptionActivity extends AppCompatActivity {
         scatterChart.setData(data);
         scatterChart.invalidate();
 //
-//        IAxisValueFormatter formatter = new MyXAxisValueFormatter(values);
+        IAxisValueFormatter formatter = new MyXAxisValueFormatter(values);
 //
-//        XAxis xAxis = scatterChart.getXAxis();
-//        xAxis.setGranularity(1f); // minimum axis-step (interval) is 1
-//        xAxis.setValueFormatter(formatter);
-
+        XAxis xAxis = scatterChart.getXAxis();
+        xAxis.setGranularity(1f); // minimum axis-step (interval) is 1
+        xAxis.setValueFormatter(formatter);
     }
 
     public class MyXAxisValueFormatter implements IAxisValueFormatter {
@@ -401,6 +387,12 @@ public class DescriptionActivity extends AppCompatActivity {
             return mValues[(int) value];
         }
 
+    }
+
+    private String customDateFormat(String date){
+        String month = date.substring(5,7);
+        String day = date.substring(8,10);
+        return (month + "/" + day);
     }
 
 
