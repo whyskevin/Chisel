@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -29,7 +30,9 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.Spinner;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 
@@ -44,6 +47,7 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
     Switch reminder_switch;
     Calendar setTimeReminder;
     Dialog dialog;
+    ArrayList<String> selectedDays;
 
     NotificationCompat.Builder notification;
     private static final int uniqueID = 45612;
@@ -55,6 +59,7 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
 
         myDB = new DatabaseHelper(this);
         dialog = new Dialog(this);
+        selectedDays = new ArrayList<>();
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(myToolbar);
@@ -186,18 +191,25 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
         Calendar calendar = Calendar.getInstance();
 //                    calendar.add(Calendar.SECOND, 5);
 
+        int requestCode = myDB.returnIDFromHT(habitName.getText().toString());
         //set reminder here with alarm service
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent intent = new Intent(getApplicationContext(), NotificationReceiver.class);
+        intent.putExtra("id", requestCode);
         intent.putExtra("name", habitName.getText().toString());
         intent.putExtra("description", habitDescription.getText().toString());
         intent.putExtra("frequency", habitFrequency.getText().toString());
-        intent.putExtra("timePeriod", spinnerSelected.toString());
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        if(setTimeReminder.before(calendar)) {
-            setTimeReminder.add(Calendar.DATE, 1);
+        intent.putExtra("timePeriod", spinnerSelected);
+        for(int i = 0; i < 7; i++) {
+            PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), requestCode + i, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            if(setTimeReminder.before(calendar)) {
+                setTimeReminder.add(Calendar.DATE, 7);
+            }
+            else {
+                setTimeReminder.add(Calendar.DATE, i);
+            }
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, setTimeReminder.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, alarmIntent);
         }
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, setTimeReminder.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
     }
 
     public void setTime(View view) {
@@ -215,14 +227,21 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
     }
 
     public void clickReminder(View view) {
-        TextView txtclose;
-        Button yes, no, buttonDaysOfWeek;
         dialog.setContentView(R.layout.reminder_popup_window);
-        buttonDaysOfWeek = findViewById(R.id.buttonDaysOfWeek);
+        TextView txtclose;
+        Button buttonDaysOfWeek;
+        buttonDaysOfWeek = dialog.findViewById(R.id.buttonDaysOfWeek);
         txtclose = dialog.findViewById(R.id.close_window);
         //yes = dialog.findViewById(R.id.btn_yes);
         //no = dialog.findViewById(R.id.btn_no);
         //use setOnItemClickListener
+        if(selectedDays.size() == 7)
+            buttonDaysOfWeek.setText("Every Day");
+        else if(selectedDays.size() > 0)
+            buttonDaysOfWeek.setText("Custom");
+        else
+            buttonDaysOfWeek.setText("No days");
+
         boolean delete = false;
         //close the window using the x button on top right
         txtclose.setOnClickListener(new View.OnClickListener() {
@@ -250,6 +269,71 @@ public class AddActivity extends AppCompatActivity implements AdapterView.OnItem
 
     public void clickDaysOfWeek(View view) {
         dialog.setContentView(R.layout.days_of_week_list);
-        
+        TextView txtclose = dialog.findViewById(R.id.close_window);
+        Button saveButton = dialog.findViewById(R.id.btn_save);
+        txtclose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
+    public void onCheckboxClicked(View view) {
+        // Is the view now checked?
+        boolean checked = ((CheckBox) view).isChecked();
+
+        // Check which checkbox was clicked
+        switch(view.getId()) {
+            case R.id.sunday:
+                if (checked && !selectedDays.contains("sunday"))
+                    selectedDays.add("sunday");
+                else
+                    selectedDays.remove("sunday");
+                // Remove the meat
+                break;
+            case R.id.monday:
+                if (checked && !selectedDays.contains("monday"))
+                    selectedDays.add("monday");
+                else
+                    selectedDays.remove("monday");
+                break;
+            case R.id.tuesday:
+                if (checked && !selectedDays.contains("tuesday"))
+                    selectedDays.add("tuesday");
+                else
+                    selectedDays.remove("tuesday");
+                break;
+            case R.id.wednesday:
+                if (checked && !selectedDays.contains("wednesday"))
+                    selectedDays.add("wednesday");
+                else
+                    selectedDays.remove("wednesday");
+                break;
+            case R.id.thursday:
+                if (checked && !selectedDays.contains("thursday"))
+                    selectedDays.add("thursday");
+                else
+                    selectedDays.remove("thursday");
+                break;
+            case R.id.friday:
+                if (checked && !selectedDays.contains("friday"))
+                    selectedDays.add("friday");
+                else
+                    selectedDays.remove("friday");
+                break;
+            case R.id.saturday:
+                if (checked && !selectedDays.contains("saturday"))
+                    selectedDays.add("saturday");
+                else
+                    selectedDays.remove("saturday");
+                break;
+        }
     }
 }
