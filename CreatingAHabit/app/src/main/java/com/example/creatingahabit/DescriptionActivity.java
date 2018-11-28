@@ -117,7 +117,6 @@ public class DescriptionActivity extends AppCompatActivity {
                     notCompleted.remove(calendarDay);
                     materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
                 }
-//                chart();
             }
         });
         materialCalendarView.setOnDateChangedListener(new OnDateSelectedListener() {
@@ -134,7 +133,6 @@ public class DescriptionActivity extends AppCompatActivity {
                     notCompleted.remove(calendarDay);
                     materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
                 }
-                chart();
             }
         });
 
