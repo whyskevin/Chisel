@@ -244,4 +244,10 @@ public class DatabaseHelper extends SQLiteOpenHelper
         return c;
     }
 
+    public Cursor getAllDataHRSortedByDate(String habitName){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String habitTableName = "Table_" + String.valueOf(returnIDFromHT(habitName));
+        return db.rawQuery("SELECT * FROM " + habitTableName + " ORDER BY DATE ASC", null);
+    }
+
 }
