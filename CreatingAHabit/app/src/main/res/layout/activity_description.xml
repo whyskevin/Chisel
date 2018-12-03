@@ -27,13 +27,17 @@
             app:mcv_selectionMode="none"
             app:mcv_selectionColor="@color/colorPrimary"
             app:mcv_showOtherDates="all" />
-        
+
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/chart"
             android:layout_width="match_parent"
             android:layout_height="180dp"
             />
 
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/linechart"
+            android:layout_width="match_parent"
+            android:layout_height="211dp" />
 
         <TextView
             android:id="@+id/textView3"
@@ -103,11 +107,6 @@
 
 
         </LinearLayout>
-
-        <com.github.mikephil.charting.charts.ScatterChart
-            android:id="@+id/scatterchart"
-            android:layout_width="match_parent"
-            android:layout_height="211dp" />
 
     </LinearLayout>
 </ScrollView>

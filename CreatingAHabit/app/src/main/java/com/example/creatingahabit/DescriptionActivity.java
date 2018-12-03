@@ -30,6 +30,7 @@ import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.ScatterData;
 import com.github.mikephil.charting.data.ScatterDataSet;
@@ -78,7 +79,7 @@ public class DescriptionActivity extends AppCompatActivity {
     ArrayList<CalendarDay> notCompleted;
     MaterialCalendarView materialCalendarView;
     PieChart graph;
-    ScatterChart scatterChart;
+    LineChart lineChart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +95,8 @@ public class DescriptionActivity extends AppCompatActivity {
         freq = findViewById(R.id.text_frequency);
         desc = findViewById(R.id.text_description);
         materialCalendarView = findViewById(R.id.calendarView);
-        scatterChart = findViewById(R.id.scatterchart);
+        lineChart = findViewById(R.id.linechart);
+
 
         graph =(PieChart) findViewById(R.id.chart);
         graph.getDescription().setEnabled(false);
@@ -141,7 +143,7 @@ public class DescriptionActivity extends AppCompatActivity {
                     }
                     materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
                 }
-                setGraphData();
+                setGraphData(); //Updates pie chart on long click
             }
         });
 
@@ -161,14 +163,14 @@ public class DescriptionActivity extends AppCompatActivity {
 //                }
 //            }
 //        });
-          setGraphData();
-        chart();
+        setGraphData();
+        lchart(); //Line Chart
 
     }
 
         public void setGraphData(){
         ArrayList<PieEntry> entries1 = new ArrayList<>();
-  if(notCompleted.size() == 0 && completed.size() == 0){
+        if(notCompleted.size() == 0 && completed.size() == 0){
             graph.setVisibility(View.GONE);
         }
         else
@@ -285,90 +287,11 @@ public class DescriptionActivity extends AppCompatActivity {
         }
     }
 
-    //Plots (10,10) on the Scatter plot in the Description Activity
-    public void testMPAndroidChart(){
-
-        ArrayList<Entry> entries = new ArrayList ();
-                entries.add(new Entry(0f, 0));
-                entries.add(new Entry(1f, 5));
-                entries.add(new Entry(2f, 10));
-//                entries.add(new Entry(12f, 3));
-//                entries.add(new Entry(18f, 4));
-//                entries.add(new Entry(9f, 5));
-
-        ScatterDataSet dataset = new ScatterDataSet(entries, "# per month");
-
-        ArrayList<String> months = new ArrayList<>();
-        months.add("Jan");
-        months.add("Feb");
-        months.add("Mar");
-
-        ArrayList<IScatterDataSet> dataSets = new ArrayList<>();
-        dataSets.add(dataset);
-        ScatterData d = new ScatterData(dataSets);
-        scatterChart.setData(d);
-        scatterChart.invalidate();
-
-
-        // the labels that should be drawn on the XAxis
-        String[] quarters = new String[] { "2018-11-26", "2018-11-28", "2018-11-27"};
-
-//        IAxisValueFormatter formatter = new IAxisValueFormatter() {
-//
-//            @Override
-//            public String getFormattedValue(float value, AxisBase axis) {
-//                return quarters[(int) value];
-//            }
-//        };
-
-
-        IAxisValueFormatter formatter = new MyXAxisValueFormatter(quarters);
-        XAxis xAxis = scatterChart.getXAxis();
-        xAxis.setGranularity(1f); // minimum axis-step (interval) is 1
-        xAxis.setValueFormatter(formatter);
-
-
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//        Date[] arrayOfDates = new Date[quarters.length];
-//        for (int index = 0; index < quarters.length; index++) {
-//            try {
-//                arrayOfDates[index] = sdf.parse(quarters[index]);
-//                Log.d("I", "To Date" +  quarters[index]);
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        String [] results = new String[3];
-//
-//        Arrays.sort(arrayOfDates);
-//        for (int index = 0; index < results.length; index++) {
-//            results[index] = sdf.format(arrayOfDates[index]);
-//            Log.d("I", "From date" + results[index]);
-//        }
-
-
-//        //Testing Scatter Data: hard code point (10,10)
-//        ArrayList<Entry> list1 = new ArrayList<Entry>();
-//        //Populate the list with new "Entries". These will be data points of the
-//        list1.add(new Entry(10,10));
-//        ScatterDataSet dataSet = new ScatterDataSet(list1, "Kevin's Data");
-//        dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-//        ArrayList<IScatterDataSet> dataSets = new ArrayList<IScatterDataSet>();
-//        dataSets.add(dataSet);
-//        ScatterData data = new ScatterData( dataSets);
-//        scatterChart.setData(data);
-//        scatterChart.invalidate();
-    }
-
-
-
-    public void chart(){
+    public void lchart(){
         int i = 0;
         ArrayList<Entry> completedDays = new ArrayList<Entry>();
         ArrayList<String> dates = new ArrayList<>();
-        //Populate the list with new "Entries". These will be data points of the
-        //int habitID = myDB.returnIDFromHT(habitName);
+        //Populate the list with new "Entries". These will be data points of the lineChart
         Cursor cursor = myDB.getAllDataHRSortedByDate(habitName);
         if(cursor.getCount() == 0) {
             Toast.makeText(this, "No data to show", Toast.LENGTH_SHORT).show();
@@ -387,8 +310,18 @@ public class DescriptionActivity extends AppCompatActivity {
             }
         }
 
-        ScatterDataSet dataSet = new ScatterDataSet(completedDays, "Kevin's Data");
+        LineDataSet dataSet = new LineDataSet(completedDays, "Days of completion for " + habitName);
         dataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        dataSet.setDrawValues(false);
+        dataSet.setCircleColor(Color.rgb(152,234,105));
+        dataSet.setColor(Color.rgb(152,234,105));
+        dataSet.setDrawFilled(true);
+        dataSet.setFillColor(Color.rgb(152,234,105));
+//        dataSet.setGradientColor(Color.rgb(152,234,105),Color.rgb(255,250,250));
+        dataSet.setDrawHorizontalHighlightIndicator(false);
+        dataSet.setDrawVerticalHighlightIndicator(false);
+
 
         int numberOfDates = dates.size();
 
@@ -414,17 +347,30 @@ public class DescriptionActivity extends AppCompatActivity {
 //        XAxis xAxis = scatterChart.getXAxis();
 //        xAxis.setValueFormatter(new MyXAxisValueFormatter(values));
 
-        ArrayList<IScatterDataSet> dataSets = new ArrayList<IScatterDataSet>();
+        ArrayList<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
         dataSets.add(dataSet);
-        ScatterData data = new ScatterData(dataSets);
-        scatterChart.setData(data);
-        scatterChart.invalidate();
+        LineData data = new LineData(dataSets);
+        lineChart.setData(data);
+        lineChart.invalidate();
 //
         IAxisValueFormatter formatter = new MyXAxisValueFormatter(values);
 //
-        XAxis xAxis = scatterChart.getXAxis();
+        XAxis xAxis = lineChart.getXAxis();
         xAxis.setGranularity(1f); // minimum axis-step (interval) is 1
         xAxis.setValueFormatter(formatter);
+        xAxis.setDrawGridLines(false); // no grid lines
+
+
+        YAxis yAxisLeft = lineChart.getAxisLeft();
+        yAxisLeft.setGranularity(1f); // interval 1
+        yAxisLeft.setLabelCount(2); // force 6 labels
+        yAxisLeft.setDrawGridLines(false); // no grid lines
+        yAxisLeft.setAxisMaximum(1.2f); // the axis max is 1.2f
+
+
+        lineChart.getAxisRight().setEnabled(false); //Disables right y-axis
+
+
     }
 
     public class MyXAxisValueFormatter implements IAxisValueFormatter {
