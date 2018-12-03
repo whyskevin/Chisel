@@ -1,6 +1,8 @@
 package com.example.creatingahabit;
 
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -277,11 +279,26 @@ public class DescriptionActivity extends AppCompatActivity {
 //            Log.d("E", "was deleted");
 //        }else
 //            Log.d("E", "wasn't deleted");
+        deleteAlarm(habitID);
         if(myDB.deleteFromHT(String.valueOf(habitID))) {
             Intent intent = new Intent(this, MainActivity.class);
             myDB.close();
             startActivity(intent);
             Toast.makeText(DescriptionActivity.this, "Habit deleted", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void deleteAlarm(int habitID) {
+        //for testing purposes
+        Calendar calendar = Calendar.getInstance();
+//                    calendar.add(Calendar.SECOND, 5);
+
+        int requestCode = habitID;
+        //set reminder here with alarm service
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent intent = new Intent(getApplicationContext(), NotificationReceiver.class);
+        for(int i = 0; i < 7; i++) {
+            alarmManager.cancel(PendingIntent.getBroadcast(getApplicationContext(), requestCode + i, intent, PendingIntent.FLAG_UPDATE_CURRENT));
         }
     }
 
