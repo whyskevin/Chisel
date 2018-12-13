@@ -39,6 +39,14 @@
                 <!-- and some more actions if you want -->
             </intent-filter>
         </receiver>
+        <receiver android:name=".NewDayReceiver" android:enabled="true" android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+                <action android:name="my.action.data" />
+                <!-- and some more actions if you want -->
+            </intent-filter>
+        </receiver>
 
 
 

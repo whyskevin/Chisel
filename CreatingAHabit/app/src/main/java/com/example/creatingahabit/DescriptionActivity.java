@@ -82,6 +82,7 @@ public class DescriptionActivity extends AppCompatActivity {
     MaterialCalendarView materialCalendarView;
     PieChart graph;
     LineChart lineChart;
+    CalendarInfo calendarInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,15 +108,13 @@ public class DescriptionActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
-            CalendarInfo calendarInfo = getIntent().getParcelableExtra("calendarInfo");
+            calendarInfo = getIntent().getParcelableExtra("calendarInfo");
             habitName = calendarInfo.getHabitName();
             setTitle(habitName);
             showInfo(habitName);
             completed = calendarInfo.getCompleted();
             notCompleted = calendarInfo.getNotCompleted();
             populateCalendar();
-            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
-            materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
 
         }
         dialog = new Dialog(this);
@@ -226,18 +225,16 @@ public class DescriptionActivity extends AppCompatActivity {
     // Purpose: Method that starts the  EditHabitActivity when the "Edit" button is clicked
     public void clickEdit(View view){
         Intent editIntent = new Intent(this, EditHabitActivity.class);
-        Bundle extra = new Bundle();
         //Passes the habit name into the Intent extra
-        extra.putString("habit_name",habitName);
-        editIntent.putExtras(extra);
+        editIntent.putExtra("calendarInfo",calendarInfo);
         myDB.close();
         //This starts the new edit activity
         startActivity(editIntent);
     }
 
     public void populateCalendar(){
-//        Cursor cs = myDB.getReadableDatabase();
-
+        materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+        materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
     }
 
     public void clickDelete(View view) {

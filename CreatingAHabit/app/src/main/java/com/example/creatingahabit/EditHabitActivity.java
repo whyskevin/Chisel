@@ -3,6 +3,7 @@ package com.example.creatingahabit;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
@@ -20,6 +21,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class EditHabitActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
@@ -29,8 +34,12 @@ public class EditHabitActivity extends AppCompatActivity implements AdapterView.
     MenuItem createHabit;
     Spinner frequencySpinner;
     String spinnerSelected;
-    String formerHabitName;
+    String formerHabitName, receivedHabitName;
     private int habitID;
+    CalendarInfo calendarInfo;
+    ArrayList<CalendarDay> completed;
+    ArrayList<CalendarDay> notCompleted;
+    MaterialCalendarView materialCalendarView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,18 +59,26 @@ public class EditHabitActivity extends AppCompatActivity implements AdapterView.
         habitFrequency = (EditText) findViewById(R.id.frequency);
         createHabit = (MenuItem) findViewById(R.id.save);
         frequencySpinner = (Spinner)findViewById(R.id.frequency_spinner);
+        materialCalendarView = findViewById(R.id.calendarView);
         spinnerCreation();
 
         //Extract data from Intent
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         //Habit name is passed through the Intent
-        String message = extras.getString("habit_name");
-        formerHabitName = message; //consolidate later@@@@@@@@@@@@@@@@@@@@@@@@@
-        setTitle(message);
+
+        if(extras != null) {
+            calendarInfo = getIntent().getParcelableExtra("calendarInfo");
+            receivedHabitName = calendarInfo.getHabitName();
+            completed = calendarInfo.getCompleted();
+            notCompleted = calendarInfo.getNotCompleted();
+            populateCalendar();
+        }
+        formerHabitName = receivedHabitName; //consolidate later@@@@@@@@@@@@@@@@@@@@@@@@@
+        setTitle(receivedHabitName);
 //        formerHabitName = habitName.getText().toString();
-        habitID = myDB.returnIDFromHT(message);
-        populateEditText(message);
+        habitID = myDB.returnIDFromHT(receivedHabitName);
+        populateEditText(receivedHabitName);
     }
 
     public void spinnerCreation(){
@@ -70,6 +87,11 @@ public class EditHabitActivity extends AppCompatActivity implements AdapterView.
         adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         frequencySpinner.setAdapter(adapter);
         frequencySpinner.setOnItemSelectedListener(this);
+    }
+
+    public void populateCalendar(){
+        materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
+        materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
     }
 
     public void populateEditText(String name){
@@ -113,11 +135,12 @@ public class EditHabitActivity extends AppCompatActivity implements AdapterView.
         if(name.length() != 0) {
             myDB.updateHT(habitID, name, habitDescription.getText().toString(),
                             habitFrequency.getText().toString(), spinnerSelected);
-            create.putExtra("name", name);
+            calendarInfo.setHabitName(name);
+            create.putExtra("calendarInfo", calendarInfo);
         }
         else {
             Toast.makeText(this, "Habit name cannot be empty", Toast.LENGTH_SHORT).show();
-            create.putExtra("name", formerHabitName);
+            create.putExtra("calendarInfo", calendarInfo);
         }
         startActivity(create);
     }

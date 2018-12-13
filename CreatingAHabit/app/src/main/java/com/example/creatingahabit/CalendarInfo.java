@@ -49,6 +49,10 @@ public class CalendarInfo implements Parcelable {
         }
     }
 
+    public void setHabitName(String habitName) {
+        this.habitName = habitName;
+    }
+
     @Override
     public int describeContents() {
         return 0;

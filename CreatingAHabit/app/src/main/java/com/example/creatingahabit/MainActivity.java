@@ -1,5 +1,6 @@
 package com.example.creatingahabit;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     ListView userList;
     ArrayList<String> listItem;
     ArrayAdapter adapter;
+    Dialog dialog;
     ArrayList<ArrayList<CalendarDay>> completedLists = new ArrayList<>(),
                                       notCompletedLists = new ArrayList<>();
 
@@ -76,6 +78,22 @@ public class MainActivity extends AppCompatActivity {
         //button = (Button) findViewById(R.id.displayHabits);
 
         //viewAll();
+        dialog = new Dialog(this);
+        myToolbar.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                dialog.setContentView(R.layout.about);
+                TextView txtclose = dialog.findViewById(R.id.close_window);
+                txtclose.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+                return true;
+            }
+        });
 
     }
 

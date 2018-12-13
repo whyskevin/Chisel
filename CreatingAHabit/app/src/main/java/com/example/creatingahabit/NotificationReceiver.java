@@ -18,7 +18,6 @@ public class NotificationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         //get data
-
         String habitName = "", habitDescription = "", habitFrequency = "", habitTimePeriod = "";
 
         int habitId = intent.getExtras().getInt("id");
