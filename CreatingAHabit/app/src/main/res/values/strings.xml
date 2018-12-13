@@ -25,4 +25,13 @@
     </string-array>
 
 
+    <string-array name="month_spinner_array">
+        <item>all time</item>
+        <item>week</item>
+        <item>month</item>
+        <item>quarter</item>
+        <item>half-year</item>
+        <item>year</item>
+    </string-array>
+
 </resources>

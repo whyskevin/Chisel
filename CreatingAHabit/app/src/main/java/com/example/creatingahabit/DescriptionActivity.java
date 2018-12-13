@@ -22,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +56,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
@@ -69,7 +73,7 @@ import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 
 //Puts data into activity_description.xml
-public class DescriptionActivity extends AppCompatActivity {
+public class DescriptionActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
 
     DatabaseHelper myDB;
@@ -79,10 +83,13 @@ public class DescriptionActivity extends AppCompatActivity {
     Dialog dialog;
     ArrayList<CalendarDay> completed;
     ArrayList<CalendarDay> notCompleted;
+    ArrayList<CalendarDay> allDays;
     MaterialCalendarView materialCalendarView;
     PieChart graph;
     LineChart lineChart;
     CalendarInfo calendarInfo;
+    Spinner monthSpinner;
+    String month_spinner_selected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +106,9 @@ public class DescriptionActivity extends AppCompatActivity {
         desc = findViewById(R.id.text_description);
         materialCalendarView = findViewById(R.id.calendarView);
         lineChart = findViewById(R.id.linechart);
+        monthSpinner = (Spinner)findViewById(R.id.month_name_spinner);
+
+        spinnerCreation(monthSpinner);
 
 
         graph =(PieChart) findViewById(R.id.chart);
@@ -144,7 +154,10 @@ public class DescriptionActivity extends AppCompatActivity {
                     }
                     materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
                 }
-                setGraphData(); //Updates pie chart on long click
+                setGraphData(notCompleted, completed);
+                allDays =addToOne();
+
+                monthSpinner.setSelection(0);
             }
         });
 
@@ -164,12 +177,93 @@ public class DescriptionActivity extends AppCompatActivity {
 //                }
 //            }
 //        });
-        setGraphData();
+        setGraphData(notCompleted, completed);
         lchart(); //Line Chart
+        allDays = addToOne(); // should be added to the listener
 
     }
 
-        public void setGraphData(){
+    public void chooseDateGraph( String range){
+        ArrayList<CalendarDay> com = new ArrayList();
+        ArrayList<CalendarDay> non = new ArrayList();
+        int rangeTime = 0;
+        if(range.equalsIgnoreCase("week")){
+            rangeTime = 7;
+        }
+        else if(range.equalsIgnoreCase("month")){
+            rangeTime = 30;
+        }
+        else if(range.equalsIgnoreCase("quarter")){
+            rangeTime = 91;
+        }
+        else if(range.equalsIgnoreCase("half-year")){
+            rangeTime = 182;
+        }
+        else if(range.equalsIgnoreCase("year")){
+            rangeTime = 365;
+        }
+
+        for(int i =0; i < rangeTime ; i++){
+            if(allDays.size() - 1 < i){
+                break;
+            }
+            if(completed.contains(allDays.get(i))){
+                com.add(allDays.get(i));
+            }
+            else
+                non.add(allDays.get(i));
+        }
+        if(rangeTime == 0)
+            setGraphData(notCompleted, completed);
+        else
+            setGraphData(non,com);
+    }
+    public class CustomComparator implements Comparator<CalendarDay> {
+        @Override
+        public int compare(CalendarDay o1, CalendarDay o2) {
+            return o1.getDate().compareTo(o2.getDate());
+        }
+    }
+    public ArrayList addToOne(){
+        ArrayList<CalendarDay> allOf = new ArrayList<CalendarDay>();
+        allOf.addAll(completed);
+        allOf.addAll(notCompleted);
+        Collections.sort(allOf, new CustomComparator());
+        Collections.reverse(allOf);
+        return allOf;
+    }
+    public void spinnerCreation(Spinner spinner){
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.month_spinner_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        monthSpinner.setAdapter(adapter);
+        monthSpinner.setOnItemSelectedListener(this);
+    }
+    public void onItemSelected(AdapterView<?> parent, View view,
+                               int pos, long id) {
+        month_spinner_selected = parent.getItemAtPosition(pos).toString();
+        chooseDateGraph(month_spinner_selected);
+        // An item was selected. You can retrieve the selected item using
+        // parent.getItemAtPosition(pos)
+    }
+
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
+    }
+    public HashSet<CalendarDay> getCalendarDaysSet(org.threeten.bp.LocalDate cal1, org.threeten.bp.LocalDate cal2) {
+        HashSet<CalendarDay> setDays = new HashSet<>();
+
+        while (cal1.isBefore(cal2)) {
+
+            CalendarDay calDay = CalendarDay.from(cal1);
+            setDays.add(calDay);
+
+            cal1 = cal1.plusDays(1);
+        }
+        return setDays;
+    }
+
+    public void setGraphData( ArrayList<CalendarDay> notCompleted, ArrayList<CalendarDay> completed){
         ArrayList<PieEntry> entries1 = new ArrayList<>();
         if(notCompleted.size() == 0 && completed.size() == 0){
             graph.setVisibility(View.GONE);
@@ -198,7 +292,7 @@ public class DescriptionActivity extends AppCompatActivity {
         graph.setData(data);
         graph.invalidate();
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent add = new Intent(this, MainActivity.class);
@@ -235,6 +329,7 @@ public class DescriptionActivity extends AppCompatActivity {
     public void populateCalendar(){
         materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#98EA69"), completed));
         materialCalendarView.addDecorator(new EventDecorator(Color.parseColor("#EF6461"), notCompleted));
+
     }
 
     public void clickDelete(View view) {

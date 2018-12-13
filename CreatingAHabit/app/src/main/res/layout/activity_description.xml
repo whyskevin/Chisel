@@ -28,6 +28,15 @@
             app:mcv_selectionColor="@color/colorPrimary"
             app:mcv_showOtherDates="all" />
 
+        <Spinner
+            android:id="@+id/month_name_spinner"
+            android:layout_width="150dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="40dp">
+
+        </Spinner>
+
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/chart"
             android:layout_width="match_parent"
@@ -38,7 +47,7 @@
             android:id="@+id/linechart"
             android:layout_width="match_parent"
             android:layout_height="211dp"
-            android:layout_margin="30dp" />
+            android:layout_margin="30dp"/>
 
         <TextView
             android:id="@+id/textView3"
@@ -83,29 +92,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
             android:layout_marginTop="40dp">
 
             <Button
                 android:id="@+id/btn_edit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="108dp"
                 android:layout_marginTop="20dp"
-                android:layout_margin="20dp"
                 android:onClick="clickEdit"
                 android:text="@string/edit_description"/>
 
             <Button
                 android:id="@+id/btn_delete"
-                android:layout_width="wrap_content"
+                android:layout_width="88dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="20dp"
-                android:layout_margin="20dp"
+                android:layout_marginEnd="100dp"
                 android:onClick="clickDelete"
                 android:text="@string/delete_habit" />
 
 
         </LinearLayout>
-
     </LinearLayout>
 </ScrollView>
