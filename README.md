@@ -1,13 +1,18 @@
 # Chisel
 
-What does it do? Write a short sentence and list the working functionalities.
+### What is Chisel?
+Chisel is an mobile Android application that is designed to keep track of user habits over time.
 
-What is it? Clearly, indicate what that code is supposed to produce. Is it a web, desktop, mobile app or a library?
+### What technologies are used? 
 
-What technologies are used? List all the important framework and libraries that contribute to this project. It's useful for a recruiter who is not necessarily familiar with every single framework on earth to know if this is Laravel and Vue or React and Expressjs.
+##### Front-End:
 
-What is the ambition of the project? Are you just test-driving a technology or is it something that is or will go live somewhere?
+* Java and XML with Android Studio
+* [Material Calendar View](https://github.com/prolificinteractive/material-calendarview "Material Calendar View") - Used to produce a fluid Calendar to display habit completion dates.
+* [MP Android Chart](https://github.com/PhilJay/MPAndroidChart "MP Android Chart") - Used to produce data visualization with the use of PieChart and LineChart.
 
-What is the stage of the project? Clearly, indicate where you are with it. Whether it is complete or a work in progress? If it's a work in progress indicate what is done and what is pending.
+##### Back-End:
 
-Are there some known issues or things that are not properly done? If yes list them because I'll be much more tolerant when/if I find shortcomings that have been highlighted than if I just discover them myself.
+* [SQLite](https://developer.android.com/reference/android/database/sqlite/package-summary "Android SQLite") - Used for database management and data storage.
+
+### What is the stage of the project?
